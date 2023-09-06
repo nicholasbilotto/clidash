@@ -29,7 +29,7 @@ function App() {
 						<Route element={<Layout />}>
 							<Route
 								path="/"
-								element={<Navigate to="/dashboard" replace />}
+								element={<Navigate to="/login" replace />}
 							/>
 							<Route path="/dashboard" element={<Dashboard />} />
 							<Route path="/overview" element={<Overview />} />
