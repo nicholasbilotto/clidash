@@ -46,14 +46,16 @@ const hashAndSaveUsers = async () => {
 /* Unmatched Routes handling */
 
 // Serve static files from the React frontend app
+app.use("/client", clientRoutes);
+app.use("/auth", authRoutes);
+
+app.get("/", (req, res) => {
+	res.send("Hello, World!");
+});
+
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "build")));
-	/* ROUTES */
 
-	app.use("/client", clientRoutes);
-	app.use("/auth", authRoutes);
-
-	// Anything that doesn't match the above routes, send back the index.html file
 	app.get("*", (req, res) => {
 		res.sendFile(path.join(__dirname, "build/index.html"));
 	});
