@@ -16,21 +16,21 @@ const ExportIcon = createSvgIcon(
 	"SaveAlt"
 );
 
-const BubblyDataGrid = styled(DataGrid)({
+const BubblyDataGrid = styled(DataGrid)(({ theme }) => ({
 	borderRadius: 15,
 	"& .MuiDataGrid-columnHeaderTitle": {
 		color: "#1976d2",
 		fontWeight: "bold",
 	},
 	"& .MuiDataGrid-cell": {
-		color: "#616161",
+		color: theme.palette.text.primary,
 		fontWeight: 500,
 	},
 	"& .MuiDataGrid-root .MuiDataGrid-columnHeader:focus, .MuiDataGrid-root .MuiDataGrid-cell:focus":
 		{
 			outline: "none",
 		},
-});
+}));
 
 const CustomToolbar = () => (
 	<GridToolbarContainer
@@ -65,6 +65,8 @@ const ProductTable = () => {
 		sort: JSON.stringify(sort),
 		search,
 	});
+
+	console.log("SUP BRUH", data);
 
 	const handlePageChange = (params) => {
 		const newPage = params.page + 1;
@@ -101,6 +103,7 @@ const ProductTable = () => {
 	return (
 		<div style={{ height: 700, width: "100%" }}>
 			<BubblyDataGrid
+				theme={theme}
 				loading={isLoading || !data}
 				rows={rows}
 				columns={columns}

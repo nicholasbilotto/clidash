@@ -56,9 +56,6 @@ const BreakdownChart = ({ isDashboard = false }) => {
 
 	const formattedYearlySalesTotal = "$" + yearlySalesTotal.toFixed(2);
 
-	console.log(data);
-	console.log(formattedData);
-
 	return (
 		<Box
 			height={isDashboard ? "400px" : "100%"}

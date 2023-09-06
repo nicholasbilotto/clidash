@@ -1,14 +1,26 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const api = createApi({
-	baseQuery: fetchBaseQuery({ baseUrl: process.env.REACT_APP_BASE_URL }),
+	baseQuery: fetchBaseQuery({
+		baseUrl: process.env.REACT_APP_BASE_URL,
+		prepareHeaders: (headers, { getState }) => {
+			const token = getState().auth.token;
+			if (token) {
+				headers.set("x-auth-token", token);
+			}
+			return headers;
+		},
+	}),
 	reducerPath: "adminApi",
-	tagTypes: ["User", "Dashboard", "Products", "Contracts", "Royalties"],
+	tagTypes: [
+		"User",
+		"Dashboard",
+		"Products",
+		"Contracts",
+		"Royalties",
+		"Users",
+	],
 	endpoints: (build) => ({
-		getUser: build.query({
-			query: (id) => `general/user/${id}`,
-			providesTags: ["User"],
-		}),
 		getDashboard: build.query({
 			query: () => "general/dashboard",
 			providesTags: ["Dashboard"],
@@ -36,10 +48,7 @@ export const api = createApi({
 	}),
 });
 
-// make sure that prefix use and suffix Query align with endpoint above
-
 export const {
-	useGetUserQuery,
 	useGetDashboardQuery,
 	useGetProductsCardQuery,
 	useGetProductsTableQuery,

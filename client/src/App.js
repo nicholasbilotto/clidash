@@ -14,7 +14,6 @@ import Contracts from "scenes/contracts";
 import Royalties from "scenes/royalties";
 import RoyaltyForm from "scenes/royaltyform";
 import Admin from "scenes/admin";
-import Performance from "scenes/performance";
 import Login from "scenes/login";
 
 function App() {
@@ -41,7 +40,6 @@ function App() {
 							<Route path="/royalties" element={<Royalties />} />
 							<Route path="/royaltyform" element={<RoyaltyForm />} />
 							<Route path="/admin" element={<Admin />} />
-							<Route path="/performance" element={<Performance />} />
 						</Route>
 					</Routes>
 				</ThemeProvider>

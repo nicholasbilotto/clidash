@@ -56,8 +56,6 @@ const transformDataToTree = (data) => {
 const Tree = () => {
 	const { data, isLoading, total, refetch } = useGetProductsTableQuery();
 
-	console.log("THIS ONEEEEE", data);
-
 	const validData = data?.docs ?? [];
 
 	// transform the data to the required format

@@ -91,10 +91,6 @@ const navItems = [
 		text: "Admin",
 		icon: <AdminPanelSettingsOutlined />,
 	},
-	{
-		text: "Performance",
-		icon: <TrendingUpOutlined />,
-	},
 ];
 
 const Sidebar = ({
@@ -124,7 +120,7 @@ const Sidebar = ({
 					sx={{
 						width: drawerWidth,
 						"& .MuiDrawer-paper": {
-							color: theme.palette.secondary[200],
+							color: theme.palette.secondary[400],
 							backgroundColor: theme.palette.background.alt,
 							boxSizing: "border-box",
 							borderWidth: isNonMobile ? 0 : "2px",
@@ -173,7 +169,7 @@ const Sidebar = ({
 											sx={{
 												backgroundColor:
 													active === lcText
-														? theme.palette.secondary[600]
+														? theme.palette.secondary[400]
 														: "transparent",
 												color:
 													active === lcText
@@ -186,8 +182,8 @@ const Sidebar = ({
 													ml: "2rem",
 													color:
 														active === lcText
-															? theme.palette.primary[600]
-															: theme.palette.secondary[200],
+															? theme.palette.primary[400]
+															: theme.palette.secondary[400],
 												}}
 											>
 												{icon}
