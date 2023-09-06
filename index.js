@@ -7,6 +7,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import bcrypt from "bcryptjs";
 import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 import clientRoutes from "./routes/client.js";
 import authRoutes from "./routes/auth.js";
@@ -35,6 +37,9 @@ import { dataArizent } from "./data/arizentroyalties.js";
 import { dataUsers } from "./data/users.js";
 
 /* USER HASH */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const hashAndSaveUsers = async () => {
 	for (let i = 0; i < dataUsers.length; i++) {
