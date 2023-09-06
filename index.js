@@ -54,17 +54,15 @@ const hashAndSaveUsers = async () => {
 app.use("/client", clientRoutes);
 app.use("/auth", authRoutes);
 
-app.get("/", (req, res) => {
-	res.send("Hello, World!");
+// app.get("/", (req, res) => {
+// 	res.send("Hello, World!");
+// });
+
+app.use(express.static(path.join(__dirname, "build"))); // Make sure 'build' actually exists and contains your React frontend
+
+app.get("*", (req, res) => {
+	res.sendFile(path.join(__dirname, "build/index.html"));
 });
-
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "build")));
-
-	app.get("*", (req, res) => {
-		res.sendFile(path.join(__dirname, "build/index.html"));
-	});
-}
 
 /* MONGOOSE SETUP */
 
