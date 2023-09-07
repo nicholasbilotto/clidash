@@ -66,8 +66,6 @@ const ProductTable = () => {
 		search,
 	});
 
-	console.log("SUP BRUH", data);
-
 	const handlePageChange = (params) => {
 		const newPage = params.page + 1;
 		const newPageSize = params.pageSize;
