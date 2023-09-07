@@ -21,6 +21,10 @@ const Royalties = () => {
 		return <div>No data available</div>;
 	}
 
+	if (true) {
+		return <div>Coming soon...</div>;
+	}
+
 	return (
 		<TableContainer component={Paper}>
 			<Table>
