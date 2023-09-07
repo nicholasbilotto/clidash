@@ -33,6 +33,13 @@ app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
+const corsOptions = {
+	origin: "http://localhost:3000", // replace with your frontend's actual origin
+	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+	credentials: true,
+	optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
 
 //data imports
 
