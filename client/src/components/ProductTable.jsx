@@ -46,7 +46,7 @@ const CustomToolbar = () => (
 
 const ProductTable = () => {
 	const [page, setPage] = useState(1);
-	const [pageSize, setPageSize] = useState(15881);
+	const [pageSize, setPageSize] = useState(100); //changed from 15881 change back for gavin site!
 	const [sort, setSort] = useState({});
 	const [search, setSearch] = useState("");
 	const [searchInput, setSearchInput] = useState("");

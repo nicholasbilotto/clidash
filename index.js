@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import helmet from "helmet";
 import morgan from "morgan";
 import bcrypt from "bcryptjs";
 import path from "path";
@@ -18,30 +17,33 @@ import authRoutes from "./routes/auth.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(helmet());
-app.use(
-	helmet.contentSecurityPolicy({
-		directives: {
-			defaultSrc: ["'self'"],
-			frameSrc: ["'self'", "https://airtable.com"],
-			// Add other directives as needed
-		},
-	})
-);
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+// Commenting out helmet for now to debug
+// app.use(helmet());
+// app.use(
+//     helmet.contentSecurityPolicy({
+//         directives: {
+//             defaultSrc: ["'self'"],
+//             frameSrc: ["'self'", "https://airtable.com"],
+//             // Add other directives as needed
+//         },
+//     })
+// );
+// app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+
+// Using specific CORS settings
 const corsOptions = {
-	origin: "http://localhost:3000", // replace with your frontend's actual origin
+	origin: "http://localhost:3000",
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 	credentials: true,
 	optionsSuccessStatus: 204,
 };
 app.use(cors(corsOptions));
 
-//data imports
+// data imports
 
 import Product from "./models/Product.js";
 import Contract from "./models/Contract.js";
@@ -52,7 +54,7 @@ import { dataContracts } from "./data/contracts.js";
 import { dataArizent } from "./data/arizentroyalties.js";
 import { dataUsers } from "./data/users.js";
 
-/* USER HASH */
+// USER HASH
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -64,17 +66,11 @@ const hashAndSaveUsers = async () => {
 	await User.insertMany(dataUsers);
 };
 
-/* Unmatched Routes handling */
-
 // Serve static files from the React frontend app
 app.use("/client", clientRoutes);
 app.use("/auth", authRoutes);
 
-// app.get("/", (req, res) => {
-// 	res.send("Hello, World!");
-// });
-
-app.use(express.static(path.join(__dirname, "build"))); // Make sure 'build' actually exists and contains your React frontend
+app.use(express.static(path.join(__dirname, "build")));
 
 app.get("*", (req, res) => {
 	res.sendFile(path.join(__dirname, "build/index.html"));
@@ -91,14 +87,12 @@ mongoose
 	.then(async () => {
 		app.listen(PORT, () => console.log(`Server Port: ${PORT} active`));
 
-		//to upload new data to database
-
+		// Uncomment these lines if you need to upload new data to the database
 		// Product.insertMany(dataProducts);
 		// Contract.insertMany(dataContracts);
 		// Royalty.insertMany(dataArizent);
-
 		// await hashAndSaveUsers();
 	})
 	.catch((error) => {
-		console.error("Error connecting to MongoDB: ", error); // <-- Added this
+		console.error("Error connecting to MongoDB: ", error);
 	});
