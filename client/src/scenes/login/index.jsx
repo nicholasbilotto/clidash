@@ -37,7 +37,7 @@ const LoginPage = () => {
 
 		try {
 			const { data } = await axios.post(
-				`${process.env.REACT_APP_API_BASE_URL}/auth/login`,
+				`${process.env.REACT_APP_BASE_URL}/auth/login`,
 				{
 					email,
 					password,
