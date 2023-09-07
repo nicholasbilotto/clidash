@@ -20,6 +20,7 @@ const themeSettings = (mode) => {
 const theme = createTheme(themeSettings("light")); // Choose mode 'light' or 'dark'
 
 const LoginPage = () => {
+	console.log(process.env.REACT_APP_BASE_URL);
 	const dispatch = useDispatch();
 	const [rememberMe, setRememberMe] = useState(false);
 	const [email, setEmail] = useState("");
