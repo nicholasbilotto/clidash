@@ -52,61 +52,12 @@ export const getRoyalties = async (req, res) => {
 // 	}
 // };
 
-// export const getProducts = async (req, res) => {
-// 	console.log("Received query params:", req.query);
-
-// 	try {
-// 		const { page = 1, pageSize = 100, sort = {}, filters = {} } = req.query;
-
-// 		// Convert page and pageSize to numbers
-// 		const pageNum = Number(page);
-// 		const pageSizeNum = Number(pageSize);
-
-// 		// Calculate the number of documents to skip
-// 		const skip = (pageNum - 1) * pageSizeNum;
-
-// 		// Construct the query based on filters
-// 		// let query = {};
-// 		// filterModel.forEach((filter) => {
-// 		// 	query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
-// 		// });
-
-// 		// Fetch the products with pagination, sorting, and filtering
-// 		const products = await Product.find(filters)
-// 			.sort(sort)
-// 			.skip(skip)
-// 			.limit(pageSizeNum);
-
-// 		// Count the total number of products that match the filters
-// 		const total = await Product.countDocuments(query);
-
-// 		// Send back the products and the total count
-// 		res.status(200).json({ docs: products, totalDocs: total });
-// 	} catch (error) {
-// 		console.error("Error in Get Products", error);
-// 		res.status(500).json({ message: error.message });
-// 	}
-// };
-
 export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const { page = 1, pageSize = 100, sort = {}, filters = "{}" } = req.query;
-		let parsedFilters = JSON.parse(filters);
-
-		// Convert the parsedFilters into MongoDB-friendly queries
-		const mongoFilters = {};
-		if (Array.isArray(parsedFilters)) {
-			parsedFilters.forEach((filter) => {
-				if (filter.operator === "contains") {
-					mongoFilters[filter.field] = {
-						$regex: new RegExp(filter.value, "i"),
-					};
-				}
-				// Add more conditions here based on the operators you'll support
-			});
-		}
+		const { page = 1, pageSize = 100, sort = {}, filters = {} } = req.query;
+		console.log("FILTERSSSS", filters);
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
@@ -115,14 +66,20 @@ export const getProducts = async (req, res) => {
 		// Calculate the number of documents to skip
 		const skip = (pageNum - 1) * pageSizeNum;
 
+		// Construct the query based on filters
+		// let query = {};
+		// filterModel.forEach((filter) => {
+		// 	query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
+		// });
+
 		// Fetch the products with pagination, sorting, and filtering
-		const products = await Product.find(mongoFilters)
+		const products = await Product.find(filters)
 			.sort(sort)
 			.skip(skip)
 			.limit(pageSizeNum);
 
 		// Count the total number of products that match the filters
-		const total = await Product.countDocuments(mongoFilters);
+		const total = await Product.countDocuments(query);
 
 		// Send back the products and the total count
 		res.status(200).json({ docs: products, totalDocs: total });
@@ -131,3 +88,47 @@ export const getProducts = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
+
+// export const getProducts = async (req, res) => {
+// 	console.log("Received query params:", req.query);
+
+// 	try {
+// 		const { page = 1, pageSize = 100, sort = {}, filters = "{}" } = req.query;
+// 		let parsedFilters = JSON.parse(filters);
+
+// 		// Convert the parsedFilters into MongoDB-friendly queries
+// 		const mongoFilters = {};
+// 		if (Array.isArray(parsedFilters)) {
+// 			parsedFilters.forEach((filter) => {
+// 				if (filter.operator === "contains") {
+// 					mongoFilters[filter.field] = {
+// 						$regex: new RegExp(filter.value, "i"),
+// 					};
+// 				}
+// 				// Add more conditions here based on the operators you'll support
+// 			});
+// 		}
+
+// 		// Convert page and pageSize to numbers
+// 		const pageNum = Number(page);
+// 		const pageSizeNum = Number(pageSize);
+
+// 		// Calculate the number of documents to skip
+// 		const skip = (pageNum - 1) * pageSizeNum;
+
+// 		// Fetch the products with pagination, sorting, and filtering
+// 		const products = await Product.find(mongoFilters)
+// 			.sort(sort)
+// 			.skip(skip)
+// 			.limit(pageSizeNum);
+
+// 		// Count the total number of products that match the filters
+// 		const total = await Product.countDocuments(mongoFilters);
+
+// 		// Send back the products and the total count
+// 		res.status(200).json({ docs: products, totalDocs: total });
+// 	} catch (error) {
+// 		console.error("Error in Get Products", error);
+// 		res.status(500).json({ message: error.message });
+// 	}
+// };
