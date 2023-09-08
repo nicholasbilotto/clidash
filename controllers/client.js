@@ -56,7 +56,7 @@ export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const { page = 1, pageSize = 100, sort = {}, ffilters = {} } = req.query;
+		const { page = 1, pageSize = 100, sort = {}, filters = {} } = req.query;
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);

@@ -75,6 +75,12 @@ const ProductTable = () => {
 		setPage(newPage);
 		setPageSize(newPageSize);
 
+		console.log("Refetching with params:", {
+			page,
+			pageSize,
+			filters: filterModel,
+		});
+
 		// Fetch new data
 		refetch({
 			page: newPage,
