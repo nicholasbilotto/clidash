@@ -45,8 +45,9 @@ const CustomToolbar = () => (
 );
 
 const ProductTable = () => {
-	const [page, setPage] = useState(1);
-	const [pageSize, setPageSize] = useState(100); //changed from 15881 change back for gavin site!
+	const [page, setPage] = useState(1); // Initial page
+	const [pageSize, setPageSize] = useState(1000); // Initial page size
+
 	const [sort, setSort] = useState({});
 	const [search, setSearch] = useState("");
 	const [searchInput, setSearchInput] = useState("");
@@ -59,23 +60,34 @@ const ProductTable = () => {
 
 	const theme = useTheme();
 
-	const { data, isLoading, total, refetch } = useGetProductsTableQuery({
+	const { data, isLoading, refetch } = useGetProductsTableQuery({
 		page,
 		pageSize,
-		sort: JSON.stringify(sort),
-		search,
 	});
 
-	const handlePageChange = (params) => {
-		const newPage = params.page + 1;
-		const newPageSize = params.pageSize;
+	const handlePaginationModelChange = (model) => {
+		const newPage = model.page + 1; // Convert to 1-based index
+		const newPageSize = model.pageSize;
+
+		// Update state
 		setPage(newPage);
 		setPageSize(newPageSize);
+
+		// Fetch new data
 		refetch({
 			page: newPage,
 			pageSize: newPageSize,
-			sort: JSON.stringify(sort),
-			search,
+		});
+
+		console.log(`Switched to page ${newPage} with page size ${newPageSize}`);
+	};
+
+	const handleFilterModelChange = (newFilterModel) => {
+		// Your logic to update the filters
+		refetch({
+			page: 1, // Reset to the first page when filters are applied
+			pageSize,
+			filterModel: newFilterModel,
 		});
 	};
 
@@ -87,29 +99,25 @@ const ProductTable = () => {
 		columns = Object.keys(data.docs[0]).map((key) => ({
 			field: key,
 			headerName: key,
-			width: 350,
-			hide: !visibleColumns.includes(key),
+			width: 150,
 		}));
 
-		// Assign an id to each row (required by DataGrid)
-		rows = data.docs.map((item, index) => ({
-			id: index,
-			...item,
-		}));
+		// Add an 'id' field for DataGrid to use
+		rows = data.docs.map((doc, index) => ({ id: index, ...doc }));
 	}
 
 	return (
 		<div style={{ height: 700, width: "100%" }}>
 			<BubblyDataGrid
-				theme={theme}
 				loading={isLoading || !data}
 				rows={rows}
 				columns={columns}
-				pageSize={pageSize}
-				onPageChange={handlePageChange}
+				paginationMode="server"
 				rowCount={data?.totalDocs}
-				pagination
+				onPaginationModelChange={handlePaginationModelChange}
 				slots={{ toolbar: GridToolbar }}
+				filterMode="server"
+				onFilterModelChange={handleFilterModelChange}
 			/>
 			{/* // pageSizeOptions={[100, 500, 1000]} need data grid pro /> */}
 		</div>

@@ -24,9 +24,42 @@ export const getRoyalties = async (req, res) => {
 	}
 };
 
+// export const getProducts = async (req, res) => {
+// 	try {
+// 		const { page = 1, pageSize = 100, sort = {} } = req.query;
+
+// 		// Convert page and pageSize to numbers
+// 		const pageNum = Number(page);
+// 		const pageSizeNum = Number(pageSize);
+
+// 		// Calculate the number of documents to skip
+// 		const skip = (pageNum - 1) * pageSizeNum;
+
+// 		// Fetch the products with pagination and sorting
+// 		const products = await Product.find()
+// 			.sort(sort)
+// 			.skip(skip)
+// 			.limit(pageSizeNum);
+
+// 		// Count the total number of products
+// 		const total = await Product.countDocuments();
+
+// 		// Send back the products and the total count
+// 		res.status(200).json({ docs: products, totalDocs: total });
+// 	} catch (error) {
+// 		console.error("Error in Get Products", error);
+// 		res.status(500).json({ message: error.message });
+// 	}
+// };
+
 export const getProducts = async (req, res) => {
 	try {
-		const { page = 1, pageSize = 100, sort = {} } = req.query;
+		const {
+			page = 1,
+			pageSize = 100,
+			sort = {},
+			filterModel = [],
+		} = req.query;
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
@@ -35,14 +68,20 @@ export const getProducts = async (req, res) => {
 		// Calculate the number of documents to skip
 		const skip = (pageNum - 1) * pageSizeNum;
 
-		// Fetch the products with pagination and sorting
-		const products = await Product.find()
+		// Construct the query based on filters
+		let query = {};
+		filterModel.forEach((filter) => {
+			query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
+		});
+
+		// Fetch the products with pagination, sorting, and filtering
+		const products = await Product.find(query)
 			.sort(sort)
 			.skip(skip)
 			.limit(pageSizeNum);
 
-		// Count the total number of products
-		const total = await Product.countDocuments();
+		// Count the total number of products that match the filters
+		const total = await Product.countDocuments(query);
 
 		// Send back the products and the total count
 		res.status(200).json({ docs: products, totalDocs: total });
