@@ -83,6 +83,7 @@ const ProductTable = () => {
 	};
 
 	const handleFilterModelChange = (newFilterModel) => {
+		console.log("Filter model changed:", newFilterModel);
 		// Your logic to update the filters
 		refetch({
 			page: 1, // Reset to the first page when filters are applied
