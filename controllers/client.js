@@ -29,7 +29,7 @@ export const getProducts = async (req, res) => {
 
 	try {
 		const { page = 1, pageSize = 100, sort = {}, filters = {} } = req.query;
-		console.log(JSON.parse(filters));
+		// console.log(JSON.parse(filters));
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
 		const pageSizeNum = Number(pageSize);
