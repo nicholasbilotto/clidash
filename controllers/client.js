@@ -53,6 +53,8 @@ export const getRoyalties = async (req, res) => {
 // };
 
 export const getProducts = async (req, res) => {
+	console.log("Received query params:", req.query);
+
 	try {
 		const {
 			page = 1,
