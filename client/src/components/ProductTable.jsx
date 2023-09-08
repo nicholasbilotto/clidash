@@ -47,6 +47,8 @@ const CustomToolbar = () => (
 const ProductTable = () => {
 	const [page, setPage] = useState(1); // Initial page
 	const [pageSize, setPageSize] = useState(1000); // Initial page size
+	const [filterModel, setFilterModel] = useState({});
+	const [filters, setFilters] = useState([]);
 
 	const [sort, setSort] = useState({});
 	const [search, setSearch] = useState("");
@@ -77,18 +79,26 @@ const ProductTable = () => {
 		refetch({
 			page: newPage,
 			pageSize: newPageSize,
+			filters: filterModel,
 		});
 
 		console.log(`Switched to page ${newPage} with page size ${newPageSize}`);
 	};
 
-	const handleFilterModelChange = (newFilterModel) => {
-		console.log("Filter model changed:", newFilterModel);
-		// Your logic to update the filters
+	const handleFilterModelChange = (newModel) => {
+		console.log("Filter model changed: ", newModel);
+
+		// Assuming newModel contains the information in a field called 'items'
+		const filterItems = newModel.items; // Extract the actual filters from newModel
+
+		// Update the React state to include these new filter settings
+		setFilters(filterItems); // Let's assume setFilters is a state setter function for your filters state
+
+		// Trigger server-side filtering by sending the updated filters to the server
 		refetch({
-			page: 1, // Reset to the first page when filters are applied
+			page,
 			pageSize,
-			filterModel: newFilterModel,
+			filters: filterItems,
 		});
 	};
 

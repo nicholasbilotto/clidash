@@ -56,12 +56,7 @@ export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const {
-			page = 1,
-			pageSize = 100,
-			sort = {},
-			filterModel = [],
-		} = req.query;
+		const { page = 1, pageSize = 100, sort = {}, ffilters = {} } = req.query;
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
@@ -71,13 +66,13 @@ export const getProducts = async (req, res) => {
 		const skip = (pageNum - 1) * pageSizeNum;
 
 		// Construct the query based on filters
-		let query = {};
-		filterModel.forEach((filter) => {
-			query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
-		});
+		// let query = {};
+		// filterModel.forEach((filter) => {
+		// 	query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
+		// });
 
 		// Fetch the products with pagination, sorting, and filtering
-		const products = await Product.find(query)
+		const products = await Product.find(filters)
 			.sort(sort)
 			.skip(skip)
 			.limit(pageSizeNum);
