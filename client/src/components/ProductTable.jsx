@@ -75,13 +75,14 @@ const ProductTable = () => {
 		// Update state
 		setPage(newPage);
 		setPageSize(newPageSize);
-		console.log("filterModel before refetch:", filterModel);
+
+		console.log("Filters before refetch:", filters);
 
 		// Fetch new data
 		refetch({
 			page: newPage,
 			pageSize: newPageSize,
-			filters: JSON.stringify(filterModel),
+			filters: JSON.stringify(filters),
 		});
 
 		console.log(`Switched to page ${newPage} with page size ${newPageSize}`);
@@ -93,7 +94,7 @@ const ProductTable = () => {
 
 		// Update the React state to include these new filter settings
 		setFilters(filterItems); // Let's assume setFilters is a state setter function for your filters state
-		console.log("filterModel before refetch:", filterModel);
+		console.log("Filters before refetch:", filters);
 
 		console.log("Refetching with params:", {
 			page,
@@ -105,7 +106,7 @@ const ProductTable = () => {
 		refetch({
 			page,
 			pageSize,
-			filters: JSON.stringify(filterModel),
+			filters: JSON.stringify(filters),
 		});
 	};
 
