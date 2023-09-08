@@ -49,6 +49,9 @@ const ProductTable = () => {
 	const [pageSize, setPageSize] = useState(1000); // Initial page size
 	const [filterModel, setFilterModel] = useState({});
 	const [filters, setFilters] = useState([]);
+	const [field, setField] = useState("");
+	const [operator, setOperator] = useState("");
+	const [value, setValue] = useState("");
 
 	const [sort, setSort] = useState({});
 	const [search, setSearch] = useState("");
@@ -65,7 +68,9 @@ const ProductTable = () => {
 	const { data, isLoading, refetch } = useGetProductsTableQuery({
 		page,
 		pageSize,
-		filters: filterModel,
+		field,
+		operator,
+		value,
 	});
 
 	const handlePaginationModelChange = (model) => {
@@ -89,25 +94,28 @@ const ProductTable = () => {
 	};
 
 	const handleFilterModelChange = (newModel) => {
-		// Assuming newModel contains the information in a field called 'items'
-		const filterItems = newModel.items; // Extract the actual filters from newModel
+		const filterItems = newModel.items || [];
+		if (filterItems.length > 0) {
+			const extractedFilters = filterItems.map((filter) => {
+				const { field, operator, value } = filter;
+				return { field, operator, value };
+			});
 
-		// Update the React state to include these new filter settings
-		setFilters(filterItems); // Let's assume setFilters is a state setter function for your filters state
-		console.log("Filters before refetch:", filters);
+			const { field, operator, value } = extractedFilters[0];
 
-		console.log("Refetching with params:", {
-			page,
-			pageSize,
-			filters: filterItems,
-		});
+			// Update state variables
+			setField(field);
+			setOperator(operator);
+			setValue(value);
 
-		// Trigger server-side filtering by sending the updated filters to the server
-		refetch({
-			page,
-			pageSize,
-			filters: filters,
-		});
+			refetch({
+				page,
+				pageSize,
+				field,
+				operator,
+				value,
+			});
+		}
 	};
 
 	// Generate columns from data keys

@@ -37,15 +37,11 @@ export const api = createApi({
 		// 	},
 		// 	providesTags: ["Products"],
 		// }),
+		// in your API client
 		getProductsTable: build.query({
 			query: (params) => {
-				const { page, pageSize, filters } = params;
-				const queryParams = new URLSearchParams({
-					page,
-					pageSize,
-					filters: JSON.stringify(filters), // Stringify the filter array here
-				});
-				return `client/products?${queryParams.toString()}`;
+				const query = new URLSearchParams(params).toString();
+				return `client/products?${query}`;
 			},
 			providesTags: ["Products"],
 		}),
