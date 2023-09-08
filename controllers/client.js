@@ -65,12 +65,6 @@ export const getProducts = async (req, res) => {
 		// Calculate the number of documents to skip
 		const skip = (pageNum - 1) * pageSizeNum;
 
-		// Construct the query based on filters
-		// let query = {};
-		// filterModel.forEach((filter) => {
-		// 	query[filter.field] = filter.value; // This is simplified; you might need more complex logic here
-		// });
-
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(filters)
 			.sort(sort)
@@ -78,7 +72,7 @@ export const getProducts = async (req, res) => {
 			.limit(pageSizeNum);
 
 		// Count the total number of products that match the filters
-		const total = await Product.countDocuments(query);
+		const total = await Product.countDocuments(filters);
 
 		// Send back the products and the total count
 		res.status(200).json({ docs: products, totalDocs: total });
