@@ -82,7 +82,7 @@ const ProductTable = () => {
 		refetch({
 			page: newPage,
 			pageSize: newPageSize,
-			filters: JSON.stringify(filters),
+			filters: filters,
 		});
 
 		console.log(`Switched to page ${newPage} with page size ${newPageSize}`);
@@ -106,7 +106,7 @@ const ProductTable = () => {
 		refetch({
 			page,
 			pageSize,
-			filters: JSON.stringify(filters),
+			filters: filters,
 		});
 	};
 
