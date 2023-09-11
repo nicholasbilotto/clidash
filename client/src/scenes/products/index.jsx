@@ -23,9 +23,9 @@ const Breakdown = () => {
 
 	return (
 		<Box m="1.5rem 2.5rem">
-			<Header title="PRODUCTS" subtitle="See your list of products" />
-			<Header subtitle="when filtering type value first" />
-			<Box>
+			<Header title="PRODUCTS" subtitle="When filtering type value first" />
+			<Table />
+			{/* <Box>
 				<Select value={currentView} onChange={handleViewChange}>
 					<MenuItem value={VIEW_TYPES.TABLE}>Table</MenuItem>
 					<MenuItem value={VIEW_TYPES.TREE}>Tree</MenuItem>
@@ -36,7 +36,7 @@ const Breakdown = () => {
 				{currentView === VIEW_TYPES.TABLE ? <Table token={token} /> : null}
 				{currentView === VIEW_TYPES.TREE ? <></> : null}
 				{currentView === VIEW_TYPES.CARDS ? <></> : null}
-			</Box>
+			</Box> */}
 		</Box>
 	);
 };
