@@ -24,36 +24,6 @@ export const getRoyalties = async (req, res) => {
 	}
 };
 
-// export const getProducts = async (req, res) => {
-// 	console.log("Received query params:", req.query);
-
-// 	try {
-// 		const { page = 1, pageSize = 100, sort = {}, filters = {} } = req.query;
-// 		// console.log(JSON.parse(filters));
-// 		// Convert page and pageSize to numbers
-// 		const pageNum = Number(page);
-// 		const pageSizeNum = Number(pageSize);
-
-// 		// Calculate the number of documents to skip
-// 		const skip = (pageNum - 1) * pageSizeNum;
-
-// 		// Fetch the products with pagination and sorting
-// 		const products = await Product.find()
-// 			.sort(sort)
-// 			.skip(skip)
-// 			.limit(pageSizeNum);
-
-// 		// Count the total number of products
-// 		const total = await Product.countDocuments();
-
-// 		// Send back the products and the total count
-// 		res.status(200).json({ docs: products, totalDocs: total });
-// 	} catch (error) {
-// 		console.error("Error in Get Products", error);
-// 		res.status(500).json({ message: error.message });
-// 	}
-// };
-
 export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
@@ -92,9 +62,12 @@ export const getProducts = async (req, res) => {
 			}
 		}
 
+		const parsedSort = {};
+		parsedSort[sort.field] = Number(sort.order);
+
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)
-			.sort(sort)
+			.sort(parsedSort)
 			.skip(skip)
 			.limit(pageSizeNum);
 
