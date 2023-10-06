@@ -15,6 +15,7 @@ import Royalties from "scenes/royalties";
 import RoyaltyForm from "scenes/royaltyform";
 import Admin from "scenes/admin";
 import Login from "scenes/login";
+import DataTable from "scenes/datatable";
 
 function App() {
 	const mode = useSelector((state) => state.global.mode);
@@ -39,6 +40,7 @@ function App() {
 							<Route path="/contracts" element={<Contracts />} />
 							<Route path="/royalties" element={<Royalties />} />
 							<Route path="/royaltyform" element={<RoyaltyForm />} />
+							<Route path="/datatable" element={<DataTable />} />
 							<Route path="/admin" element={<Admin />} />
 						</Route>
 					</Routes>
