@@ -38,7 +38,10 @@ export const getProducts = async (req, res) => {
 		// Validate and parse sort parameter
 		let parsedSort = {};
 		try {
-			parsedSort = JSON.parse(decodeURIComponent(sort));
+			// Decode and parse the JSON string
+			const decodedSortStr = decodeURIComponent(sort);
+			const sortStr = JSON.parse(decodedSortStr);
+			parsedSort = JSON.parse(sortStr);
 		} catch (e) {
 			console.error("Error parsing sort parameter", e);
 			return res.status(400).json({ message: "Invalid sort parameter" });
