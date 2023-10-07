@@ -311,6 +311,8 @@ const ProductTablePrime = () => {
 		);
 	};
 
+	console.log("Applying Filters:", filters);
+
 	return (
 		<div>
 			{error && <p>Error: {error.message}</p>}

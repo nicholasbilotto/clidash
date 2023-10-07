@@ -48,6 +48,10 @@ const navItems = [
 		icon: <ShoppingCartOutlined />,
 	},
 	{
+		text: "DataTable",
+		icon: <ShoppingCartOutlined />,
+	},
+	{
 		text: " ",
 		icon: null,
 	},
