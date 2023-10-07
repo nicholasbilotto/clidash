@@ -68,12 +68,15 @@ export const getProducts = async (req, res) => {
 		} catch (e) {
 			console.error("Error parsing sort parameter", e);
 		}
+		console.log("Parsed Sort Parameters:", parsedSort);
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)
 			.sort(parsedSort)
 			.skip(skip)
 			.limit(pageSizeNum);
+
+		console.log("Fetched Products:", products);
 
 		// Count the total number of filtered products
 		const total = await Product.countDocuments(query);
