@@ -35,7 +35,10 @@ export const api = createApi({
 				console.log("API Request Params:", params);
 				const query = new URLSearchParams({
 					...params,
-					sort: JSON.stringify(params.sort), // Ensure sort is serialized if needed
+					sort:
+						typeof params.sort === "string"
+							? params.sort
+							: JSON.stringify(params.sort),
 				}).toString();
 				return `client/products?${query}`;
 			},

@@ -28,46 +28,59 @@ export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const { page = 1, pageSize = 100, sort = {} } = req.query;
+		const {
+			page = 1,
+			pageSize = 100,
+			sortField,
+			sortOrder,
+			field,
+			operator,
+			value,
+		} = req.query;
 
+		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
 		const pageSizeNum = Number(pageSize);
 
+		// Calculate the number of documents to skip
 		const skip = (pageNum - 1) * pageSizeNum;
 
-		// Validate and parse sort parameter
+		// Initialize the query object
+		let query = {};
+
+		// Add field and value to the query if provided
+		if (field && operator && value) {
+			switch (operator) {
+				case "equals":
+					query[field] = value;
+					break;
+				case "contains":
+					query[field] = { $regex: value, $options: "i" };
+					break;
+				// Add more cases based on your needs
+				default:
+					break;
+			}
+		}
+
 		let parsedSort = {};
-		try {
-			// Decode and parse the JSON string
-			const decodedSortStr = decodeURIComponent(sort);
-			const sortStr = JSON.parse(decodedSortStr);
-			parsedSort = JSON.parse(sortStr);
-		} catch (e) {
-			console.error("Error parsing sort parameter", e);
-			return res.status(400).json({ message: "Invalid sort parameter" });
+		if (sortField && sortOrder) {
+			parsedSort[sortField] = sortOrder;
 		}
+		console.log("Parsed Sort Parameters:", parsedSort);
 
-		// Validate the sort fields and order
-		const validFields = ["ProductName", "Category"]; // Add other fields as needed
-		if (
-			!parsedSort.field ||
-			!validFields.includes(parsedSort.field) ||
-			![1, -1].includes(parsedSort.order)
-		) {
-			console.error("Invalid sort parameter:", parsedSort);
-			return res.status(400).json({ message: "Invalid sort parameter" });
-		}
-
-		// Fetch and sort the products
-		const products = await Product.find()
+		// Fetch the products with pagination, sorting, and filtering
+		const products = await Product.find(query)
 			.sort(parsedSort)
 			.skip(skip)
 			.limit(pageSizeNum);
 
-		// Count total filtered products
-		const total = await Product.countDocuments();
+		console.log("Fetched Products:", products);
 
-		// Send the products and total count
+		// Count the total number of filtered products
+		const total = await Product.countDocuments(query);
+
+		// Send back the products and the total count
 		res.status(200).json({ docs: products, totalDocs: total });
 	} catch (error) {
 		console.error("Error in Get Products", error);

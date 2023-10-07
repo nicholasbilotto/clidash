@@ -16,7 +16,7 @@ const ProductTablePrime = () => {
 	const [expandedRows, setExpandedRows] = useState(null);
 	const [sort, setSort] = useState({ field: "ProductName", order: 1 });
 
-	const sortParam = encodeURIComponent(JSON.stringify(JSON.stringify(sort)));
+	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
 	const { data, error, isLoading } = useGetProductsTableQuery({
 		page: page,
