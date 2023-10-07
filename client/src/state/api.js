@@ -32,15 +32,28 @@ export const api = createApi({
 		}),
 		getProductsTable: build.query({
 			query: (params) => {
-				console.log("API Request Params:", params);
-				const query = new URLSearchParams({
-					...params,
-					sort:
-						typeof params.sort === "string"
-							? params.sort
-							: JSON.stringify(params.sort),
-				}).toString();
-				return `client/products?${query}`;
+				const { page, pageSize, sort, filters } = params;
+
+				// Construct URL with parameters
+				const urlParams = new URLSearchParams();
+				urlParams.append("page", page);
+				urlParams.append("pageSize", pageSize);
+				urlParams.append(
+					"sort",
+					typeof sort === "string" ? sort : JSON.stringify(sort)
+				);
+
+				// Add filters to URL parameters
+				if (filters) {
+					urlParams.append(
+						"filters",
+						typeof filters === "string"
+							? filters
+							: JSON.stringify(filters)
+					);
+				}
+
+				return `client/products?${urlParams.toString()}`;
 			},
 			providesTags: ["Products"],
 		}),
@@ -62,3 +75,18 @@ export const {
 	useGetContractsQuery,
 	useGetRoyaltiesQuery,
 } = api;
+
+// getProductsTable: build.query({
+// 	query: (params) => {
+// 		console.log("API Request Params:", params);
+// 		const query = new URLSearchParams({
+// 			...params,
+// 			sort:
+// 				typeof params.sort === "string"
+// 					? params.sort
+// 					: JSON.stringify(params.sort),
+// 		}).toString();
+// 		return `client/products?${query}`;
+// 	},
+// 	providesTags: ["Products"],
+// }),

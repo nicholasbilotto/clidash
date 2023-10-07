@@ -15,13 +15,15 @@ const ProductTablePrime = () => {
 	const [pageSize, setPageSize] = useState(100);
 	const [expandedRows, setExpandedRows] = useState(null);
 	const [sort, setSort] = useState({ field: "ProductName", order: 1 });
+	const [filters, setFilters] = useState({});
 
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
 	const { data, error, isLoading } = useGetProductsTableQuery({
 		page: page,
 		pageSize: pageSize,
-		sort: sortParam, // Pass the encoded sort parameter
+		sort: sortParam,
+		filters: encodeURIComponent(JSON.stringify(filters)),
 	});
 
 	const products = data?.docs || [];
@@ -60,6 +62,18 @@ const ProductTablePrime = () => {
 	);
 
 	const footer = `${products ? products.length : 0} of  ${totalProducts}`;
+
+	const handleFilterChange = (field, value) => {
+		const newFilters = { ...filters };
+
+		if (value) {
+			newFilters[field] = value;
+		} else {
+			delete newFilters[field]; // remove the filter if the value is empty
+		}
+
+		setFilters(newFilters);
+	};
 
 	const rowExpansionTemplate = (data) => {
 		return (
@@ -322,9 +336,27 @@ const ProductTablePrime = () => {
 				onSort={(e) => setSort({ field: e.sortField, order: e.sortOrder })}
 			>
 				<Column expander style={{ width: "3em" }} />
-				<Column field="Client" header="Client" sortable />
-				<Column field="ProductName" header="Product Name" sortable />
-				<Column field="Category" header="Category" sortable />
+				<Column
+					field="Client"
+					header="Client"
+					filter
+					filterPlaceholder="Search by Client"
+					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+				/>
+				<Column
+					field="Category"
+					header="Category"
+					filter
+					filterPlaceholder="Search by Client"
+					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+				/>
+				<Column
+					field="ProductName"
+					header="Product Name"
+					filter
+					filterPlaceholder="Search by Client"
+					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+				/>
 			</DataTable>
 		</div>
 	);

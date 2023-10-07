@@ -28,15 +28,7 @@ export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const {
-			page = 1,
-			pageSize = 100,
-			sortField,
-			sortOrder,
-			field,
-			operator,
-			value,
-		} = req.query;
+		const { page = 1, pageSize = 100, sort, filters } = req.query;
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
@@ -48,24 +40,26 @@ export const getProducts = async (req, res) => {
 		// Initialize the query object
 		let query = {};
 
-		// Add field and value to the query if provided
-		if (field && operator && value) {
-			switch (operator) {
-				case "equals":
-					query[field] = value;
-					break;
-				case "contains":
-					query[field] = { $regex: value, $options: "i" };
-					break;
-				// Add more cases based on your needs
-				default:
-					break;
+		// Parse filters and incorporate into query
+		if (filters) {
+			try {
+				const parsedFilters = JSON.parse(filters);
+				// Assume filters are structured like: { field: value, ... }
+				for (const [field, value] of Object.entries(parsedFilters)) {
+					query[field] = { $regex: value, $options: "i" }; // Here we're assuming string contains. You can add more complex logic based on the filter structure.
+				}
+			} catch (err) {
+				console.error("Error parsing filters", err);
 			}
 		}
 
 		let parsedSort = {};
-		if (sortField && sortOrder) {
-			parsedSort[sortField] = sortOrder;
+		if (sort) {
+			try {
+				parsedSort = JSON.parse(sort);
+			} catch (e) {
+				console.error("Error parsing sort parameter", e);
+			}
 		}
 		console.log("Parsed Sort Parameters:", parsedSort);
 
