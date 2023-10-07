@@ -69,8 +69,6 @@ export const getProducts = async (req, res) => {
 			.skip(skip)
 			.limit(pageSizeNum);
 
-		console.log("Fetched Products:", products);
-
 		// Count the total number of filtered products
 		const total = await Product.countDocuments(query);
 
