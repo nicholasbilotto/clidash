@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { DataTable } from "primereact/datatable";
+import { useEffect } from "react";
 import { Column } from "primereact/column";
 import { TabView, TabPanel } from "primereact/tabview";
 import { useGetProductsTableQuery } from "state/api";
@@ -18,11 +19,23 @@ const ProductTablePrime = () => {
 	const { data, error, isLoading } = useGetProductsTableQuery({
 		page: page,
 		pageSize: pageSize,
-		sort: sort,
+		sort: JSON.stringify(sort),
 	});
+
+	useEffect(() => {
+		console.log("Sending request with sort:", sort);
+	}, [sort]);
 
 	const products = data?.docs || [];
 	const totalProducts = data?.totalDocs || 0;
+
+	useEffect(() => {
+		console.log("Received data:", data);
+	}, [data]);
+
+	useEffect(() => {
+		console.log("Component re-rendered.");
+	});
 
 	const itemsPerPageOptions = [
 		{ label: "100", value: 100 },

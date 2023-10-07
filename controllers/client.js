@@ -41,29 +41,15 @@ export const getProducts = async (req, res) => {
 		const pageNum = Number(page);
 		const pageSizeNum = Number(pageSize);
 
-		// Calculate the number of documents to skip
-		const skip = (pageNum - 1) * pageSizeNum;
+		// ...
 
-		// Initialize the query object
-		let query = {};
-
-		// Add field and value to the query if provided
-		if (field && operator && value) {
-			switch (operator) {
-				case "equals":
-					query[field] = value;
-					break;
-				case "contains":
-					query[field] = { $regex: value, $options: "i" };
-					break;
-				// Add more cases based on your needs
-				default:
-					break;
-			}
+		// Parse and decode the sort parameter
+		let parsedSort = {};
+		try {
+			parsedSort = JSON.parse(decodeURIComponent(sort));
+		} catch (e) {
+			console.error("Error parsing sort parameter", e);
 		}
-
-		const parsedSort = {};
-		parsedSort[sort.field] = Number(sort.order);
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)
