@@ -37,37 +37,41 @@ export const getProducts = async (req, res) => {
 		// Calculate the number of documents to skip
 		const skip = (pageNum - 1) * pageSizeNum;
 
-		// Initialize the query object
-		let query = {};
-
-		// Parse filters and incorporate into query
-		if (filters) {
-			try {
-				const parsedFilters = JSON.parse(filters);
-				// Assume filters are structured like: { field: value, ... }
-				for (const [field, value] of Object.entries(parsedFilters)) {
-					query[field] = { $regex: value, $options: "i" }; // Here we're assuming string contains. You can add more complex logic based on the filter structure.
-				}
-			} catch (err) {
-				console.error("Error parsing filters", err);
-			}
-		}
-
+		// Decode and then parse sort and filters parameters
 		let parsedSort = {};
+		let parsedFilters = {};
+
 		if (sort) {
 			try {
-				parsedSort = JSON.parse(sort);
+				parsedSort = JSON.parse(decodeURIComponent(sort));
 			} catch (e) {
 				console.error("Error parsing sort parameter", e);
 			}
 		}
+
+		if (filters) {
+			try {
+				parsedFilters = JSON.parse(decodeURIComponent(filters));
+			} catch (e) {
+				console.error("Error parsing filters parameter", e);
+			}
+		}
+
 		console.log("Parsed Sort Parameters:", parsedSort);
+		console.log("Parsed Filter Parameters:", parsedFilters);
+
+		// Initialize the query object
+		let query = {};
+
+		// TODO: Utilize parsedFilters to further modify the query object
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)
 			.sort(parsedSort)
 			.skip(skip)
 			.limit(pageSizeNum);
+
+		console.log("Fetched Products:", products);
 
 		// Count the total number of filtered products
 		const total = await Product.countDocuments(query);
