@@ -22,20 +22,8 @@ const ProductTablePrime = () => {
 		sort: JSON.stringify(sort),
 	});
 
-	useEffect(() => {
-		console.log("Sending request with sort:", sort);
-	}, [sort]);
-
 	const products = data?.docs || [];
 	const totalProducts = data?.totalDocs || 0;
-
-	useEffect(() => {
-		console.log("Received data:", data);
-	}, [data]);
-
-	useEffect(() => {
-		console.log("Component re-rendered.");
-	});
 
 	const itemsPerPageOptions = [
 		{ label: "100", value: 100 },
@@ -330,7 +318,6 @@ const ProductTablePrime = () => {
 				sortField={sort.field}
 				sortOrder={sort.order}
 				onSort={(e) => setSort({ field: e.sortField, order: e.sortOrder })}
-				/* ... other props ... */
 			>
 				<Column expander style={{ width: "3em" }} />
 				<Column field="Client" header="Client" sortable />
