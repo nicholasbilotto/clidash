@@ -43,7 +43,8 @@ export const getProducts = async (req, res) => {
 
 		if (sort) {
 			try {
-				parsedSort = JSON.parse(decodeURIComponent(sort));
+				const decodedSort = JSON.parse(decodeURIComponent(sort));
+				parsedSort[decodedSort.field] = decodedSort.order;
 			} catch (e) {
 				console.error("Error parsing sort parameter", e);
 			}
