@@ -19,12 +19,16 @@ const ProductTablePrime = () => {
 
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
-	const { data, error, isLoading } = useGetProductsTableQuery({
+	// Construct query parameters object
+	const queryParam = {
 		page: page,
 		pageSize: pageSize,
 		sort: sortParam,
 		filters: encodeURIComponent(JSON.stringify(filters)),
-	});
+	};
+
+	const { data, error, isLoading, refetch } =
+		useGetProductsTableQuery(queryParam);
 
 	const products = data?.docs || [];
 	const totalProducts = data?.totalDocs || 0;
@@ -63,16 +67,18 @@ const ProductTablePrime = () => {
 
 	const footer = `${products ? products.length : 0} of  ${totalProducts}`;
 
-	const handleFilterChange = (field, value) => {
-		const newFilters = { ...filters };
+	const handleFilterChange = (field, criterion, value, matchMode) => {
+		setFilters((prevFilters) => {
+			const newFilters = {
+				...prevFilters,
+				[field]: { criterion, value, matchMode },
+			};
+			return newFilters;
+		});
+	};
 
-		if (value) {
-			newFilters[field] = value;
-		} else {
-			delete newFilters[field]; // remove the filter if the value is empty
-		}
-
-		setFilters(newFilters);
+	const handleApplyFilters = () => {
+		refetch();
 	};
 
 	const rowExpansionTemplate = (data) => {
@@ -343,22 +349,32 @@ const ProductTablePrime = () => {
 					header="Client"
 					filter
 					filterPlaceholder="Search by Client"
-					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+					onFilter={(e) =>
+						handleFilterChange("Client", "contains", e.target.value)
+					}
+					sortable
 				/>
 				<Column
 					field="Category"
 					header="Category"
 					filter
-					filterPlaceholder="Search by Client"
-					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+					filterPlaceholder="Search by Category"
+					onFilter={(e) =>
+						handleFilterChange("Category", "contains", e.target.value)
+					}
+					sortable
 				/>
 				<Column
 					field="ProductName"
 					header="Product Name"
 					filter
-					filterPlaceholder="Search by Client"
-					onFilter={(e) => handleFilterChange("Client", e.target.value)}
+					filterPlaceholder="Search by Product Name"
+					onFilter={(e) =>
+						handleFilterChange("ProductName", "contains", e.target.value)
+					}
+					sortable
 				/>
+				<button onClick={handleApplyFilters}>Apply Filters</button>
 			</DataTable>
 		</div>
 	);

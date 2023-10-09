@@ -63,8 +63,51 @@ export const getProducts = async (req, res) => {
 
 		// Initialize the query object
 		let query = {};
+		let orQueries = [];
+		Object.keys(parsedFilters).forEach((field) => {
+			const filter = parsedFilters[field];
+			let fieldQuery;
+			switch (filter.criterion) {
+				case "startsWith":
+					fieldQuery = {
+						[field]: { $regex: `^${filter.value}`, $options: "i" },
+					};
+					break;
+				case "contains":
+					fieldQuery = {
+						[field]: { $regex: filter.value, $options: "i" },
+					};
+					break;
+				case "notContains":
+					fieldQuery = {
+						[field]: { $not: { $regex: filter.value, $options: "i" } },
+					};
+					break;
+				case "endsWith":
+					fieldQuery = {
+						[field]: { $regex: `${filter.value}$`, $options: "i" },
+					};
+					break;
+				case "equals":
+					fieldQuery = { [field]: filter.value };
+					break;
+				case "notEquals":
+					fieldQuery = { [field]: { $ne: filter.value } };
+					break;
+				default:
+					break;
+			}
+			if (filter.matchMode === "any") {
+				orQueries.push(fieldQuery);
+			} else {
+				// Assume 'all' as default matchMode
+				Object.assign(query, fieldQuery);
+			}
+		});
 
-		// TODO: Utilize parsedFilters to further modify the query object
+		if (orQueries.length > 0) {
+			query = { $or: orQueries };
+		}
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)
