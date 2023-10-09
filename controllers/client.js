@@ -63,58 +63,45 @@ export const getProducts = async (req, res) => {
 
 		// Initialize the query object
 		let query = {};
-		let orQueries = [];
-		let andQueries = [];
+
 		Object.keys(parsedFilters).forEach((field) => {
 			const filter = parsedFilters[field];
-			filter.constraints.forEach((constraint) => {
-				let fieldQuery;
-				switch (constraint.matchMode) {
-					case "startsWith":
-						fieldQuery = {
-							[field]: { $regex: `^${constraint.value}`, $options: "i" },
-						};
-						break;
-					case "contains":
-						fieldQuery = {
-							[field]: { $regex: constraint.value, $options: "i" },
-						};
-						break;
-					case "notContains":
-						fieldQuery = {
-							[field]: {
-								$not: { $regex: constraint.value, $options: "i" },
-							},
-						};
-						break;
-					case "endsWith":
-						fieldQuery = {
-							[field]: { $regex: `${constraint.value}$`, $options: "i" },
-						};
-						break;
-					case "equals":
-						fieldQuery = { [field]: constraint.value };
-						break;
-					case "notEquals":
-						fieldQuery = { [field]: { $ne: constraint.value } };
-						break;
-					default:
-						break;
-				}
-				if (filter.operator === "or") {
-					orQueries.push(fieldQuery);
-				} else {
-					andQueries.push(fieldQuery);
-				}
-			});
+			let fieldQuery;
+			switch (filter.matchMode) {
+				case "startsWith":
+					fieldQuery = {
+						[field]: { $regex: `^${filter.value}`, $options: "i" },
+					};
+					break;
+				case "contains":
+					fieldQuery = {
+						[field]: { $regex: filter.value, $options: "i" },
+					};
+					break;
+				case "notContains":
+					fieldQuery = {
+						[field]: { $not: { $regex: filter.value, $options: "i" } },
+					};
+					break;
+				case "endsWith":
+					fieldQuery = {
+						[field]: { $regex: `${filter.value}$`, $options: "i" },
+					};
+					break;
+				case "equals":
+					fieldQuery = { [field]: filter.value };
+					break;
+				case "notEquals":
+					fieldQuery = { [field]: { $ne: filter.value } };
+					break;
+				default:
+					break;
+			}
+			// Merge the field query into the main query using $and
+			query = {
+				$and: [...(query.$and || []), fieldQuery],
+			};
 		});
-
-		if (orQueries.length > 0) {
-			query.$or = orQueries;
-		}
-		if (andQueries.length > 0) {
-			query.$and = andQueries;
-		}
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)

@@ -68,6 +68,8 @@ const ProductTablePrime = () => {
 
 	const handleFilterChange = (e) => {
 		const { filters } = e;
+		// Here, you may need to adjust the format of 'filters' to match your backend expectations
+		// if necessary. For now, we'll just set it directly.
 		setFilters(filters);
 		refetch();
 	};
@@ -331,7 +333,7 @@ const ProductTablePrime = () => {
 				sortField={sort.field}
 				sortOrder={sort.order}
 				onSort={(e) => setSort({ field: e.sortField, order: e.sortOrder })}
-				onFilter={handleFilterChange}
+				onFilter={handleFilterChange} // This line is handling filter changes
 			>
 				<Column expander style={{ width: "3em" }} />
 				<Column
@@ -339,6 +341,7 @@ const ProductTablePrime = () => {
 					header="Client"
 					filter
 					filterPlaceholder="Search by Client"
+					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
 				/>
 				<Column
@@ -346,6 +349,7 @@ const ProductTablePrime = () => {
 					header="Category"
 					filter
 					filterPlaceholder="Search by Category"
+					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
 				/>
 				<Column
@@ -353,6 +357,7 @@ const ProductTablePrime = () => {
 					header="Product Name"
 					filter
 					filterPlaceholder="Search by Product Name"
+					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
 				/>
 			</DataTable>
