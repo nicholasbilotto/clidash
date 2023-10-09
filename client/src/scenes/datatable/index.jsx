@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
-import { useEffect } from "react";
 import { Column } from "primereact/column";
 import { TabView, TabPanel } from "primereact/tabview";
 import { useGetProductsTableQuery } from "state/api";
@@ -67,17 +66,9 @@ const ProductTablePrime = () => {
 
 	const footer = `${products ? products.length : 0} of  ${totalProducts}`;
 
-	const handleFilterChange = (field, criterion, value, matchMode) => {
-		setFilters((prevFilters) => {
-			const newFilters = {
-				...prevFilters,
-				[field]: { criterion, value, matchMode },
-			};
-			return newFilters;
-		});
-	};
-
-	const handleApplyFilters = () => {
+	const handleFilterChange = (e) => {
+		const { filters } = e;
+		setFilters(filters);
 		refetch();
 	};
 
@@ -317,8 +308,6 @@ const ProductTablePrime = () => {
 		);
 	};
 
-	console.log("Applying Filters:", filters);
-
 	return (
 		<div>
 			{error && <p>Error: {error.message}</p>}
@@ -342,6 +331,7 @@ const ProductTablePrime = () => {
 				sortField={sort.field}
 				sortOrder={sort.order}
 				onSort={(e) => setSort({ field: e.sortField, order: e.sortOrder })}
+				onFilter={handleFilterChange}
 			>
 				<Column expander style={{ width: "3em" }} />
 				<Column
@@ -349,9 +339,6 @@ const ProductTablePrime = () => {
 					header="Client"
 					filter
 					filterPlaceholder="Search by Client"
-					onFilter={(e) =>
-						handleFilterChange("Client", "contains", e.target.value)
-					}
 					sortable
 				/>
 				<Column
@@ -359,9 +346,6 @@ const ProductTablePrime = () => {
 					header="Category"
 					filter
 					filterPlaceholder="Search by Category"
-					onFilter={(e) =>
-						handleFilterChange("Category", "contains", e.target.value)
-					}
 					sortable
 				/>
 				<Column
@@ -369,12 +353,8 @@ const ProductTablePrime = () => {
 					header="Product Name"
 					filter
 					filterPlaceholder="Search by Product Name"
-					onFilter={(e) =>
-						handleFilterChange("ProductName", "contains", e.target.value)
-					}
 					sortable
 				/>
-				<button onClick={handleApplyFilters}>Apply Filters</button>
 			</DataTable>
 		</div>
 	);

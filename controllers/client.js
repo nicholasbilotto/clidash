@@ -64,49 +64,56 @@ export const getProducts = async (req, res) => {
 		// Initialize the query object
 		let query = {};
 		let orQueries = [];
+		let andQueries = [];
 		Object.keys(parsedFilters).forEach((field) => {
 			const filter = parsedFilters[field];
-			let fieldQuery;
-			switch (filter.criterion) {
-				case "startsWith":
-					fieldQuery = {
-						[field]: { $regex: `^${filter.value}`, $options: "i" },
-					};
-					break;
-				case "contains":
-					fieldQuery = {
-						[field]: { $regex: filter.value, $options: "i" },
-					};
-					break;
-				case "notContains":
-					fieldQuery = {
-						[field]: { $not: { $regex: filter.value, $options: "i" } },
-					};
-					break;
-				case "endsWith":
-					fieldQuery = {
-						[field]: { $regex: `${filter.value}$`, $options: "i" },
-					};
-					break;
-				case "equals":
-					fieldQuery = { [field]: filter.value };
-					break;
-				case "notEquals":
-					fieldQuery = { [field]: { $ne: filter.value } };
-					break;
-				default:
-					break;
-			}
-			if (filter.matchMode === "any") {
-				orQueries.push(fieldQuery);
-			} else {
-				// Assume 'all' as default matchMode
-				Object.assign(query, fieldQuery);
-			}
+			filter.constraints.forEach((constraint) => {
+				let fieldQuery;
+				switch (constraint.matchMode) {
+					case "startsWith":
+						fieldQuery = {
+							[field]: { $regex: `^${constraint.value}`, $options: "i" },
+						};
+						break;
+					case "contains":
+						fieldQuery = {
+							[field]: { $regex: constraint.value, $options: "i" },
+						};
+						break;
+					case "notContains":
+						fieldQuery = {
+							[field]: {
+								$not: { $regex: constraint.value, $options: "i" },
+							},
+						};
+						break;
+					case "endsWith":
+						fieldQuery = {
+							[field]: { $regex: `${constraint.value}$`, $options: "i" },
+						};
+						break;
+					case "equals":
+						fieldQuery = { [field]: constraint.value };
+						break;
+					case "notEquals":
+						fieldQuery = { [field]: { $ne: constraint.value } };
+						break;
+					default:
+						break;
+				}
+				if (filter.operator === "or") {
+					orQueries.push(fieldQuery);
+				} else {
+					andQueries.push(fieldQuery);
+				}
+			});
 		});
 
 		if (orQueries.length > 0) {
-			query = { $or: orQueries };
+			query.$or = orQueries;
+		}
+		if (andQueries.length > 0) {
+			query.$and = andQueries;
 		}
 
 		// Fetch the products with pagination, sorting, and filtering
@@ -132,14 +139,7 @@ export const getProducts = async (req, res) => {
 // 	console.log("Received query params:", req.query);
 
 // 	try {
-// 		const {
-// 			page = 1,
-// 			pageSize = 100,
-// 			sort = {},
-// 			field,
-// 			operator,
-// 			value,
-// 		} = req.query;
+// 		const { page = 1, pageSize = 100, sort, filters } = req.query;
 
 // 		// Convert page and pageSize to numbers
 // 		const pageNum = Number(page);
@@ -148,31 +148,77 @@ export const getProducts = async (req, res) => {
 // 		// Calculate the number of documents to skip
 // 		const skip = (pageNum - 1) * pageSizeNum;
 
-// 		// Initialize the query object
-// 		let query = {};
+// 		// Decode and then parse sort and filters parameters
+// 		let parsedSort = {};
+// 		let parsedFilters = {};
 
-// 		// Add field and value to the query if provided
-// 		if (field && operator && value) {
-// 			switch (operator) {
-// 				case "equals":
-// 					query[field] = value;
-// 					break;
-// 				case "contains":
-// 					query[field] = { $regex: value, $options: "i" };
-// 					break;
-// 				// Add more cases based on your needs
-// 				default:
-// 					break;
+// 		if (sort) {
+// 			try {
+// 				const decodedSort = JSON.parse(decodeURIComponent(sort));
+// 				parsedSort[decodedSort.field] = decodedSort.order;
+// 			} catch (e) {
+// 				console.error("Error parsing sort parameter", e);
 // 			}
 // 		}
 
-// 		let parsedSort = {};
-// 		try {
-// 			parsedSort = JSON.parse(decodeURIComponent(sort));
-// 		} catch (e) {
-// 			console.error("Error parsing sort parameter", e);
+// 		if (filters) {
+// 			try {
+// 				parsedFilters = JSON.parse(decodeURIComponent(filters));
+// 			} catch (e) {
+// 				console.error("Error parsing filters parameter", e);
+// 			}
 // 		}
+
 // 		console.log("Parsed Sort Parameters:", parsedSort);
+// 		console.log("Parsed Filter Parameters:", parsedFilters);
+
+// 		// Initialize the query object
+// 		let query = {};
+// 		let orQueries = [];
+// 		Object.keys(parsedFilters).forEach((field) => {
+// 			const filter = parsedFilters[field];
+// 			let fieldQuery;
+// 			switch (filter.criterion) {
+// 				case "startsWith":
+// 					fieldQuery = {
+// 						[field]: { $regex: `^${filter.value}`, $options: "i" },
+// 					};
+// 					break;
+// 				case "contains":
+// 					fieldQuery = {
+// 						[field]: { $regex: filter.value, $options: "i" },
+// 					};
+// 					break;
+// 				case "notContains":
+// 					fieldQuery = {
+// 						[field]: { $not: { $regex: filter.value, $options: "i" } },
+// 					};
+// 					break;
+// 				case "endsWith":
+// 					fieldQuery = {
+// 						[field]: { $regex: `${filter.value}$`, $options: "i" },
+// 					};
+// 					break;
+// 				case "equals":
+// 					fieldQuery = { [field]: filter.value };
+// 					break;
+// 				case "notEquals":
+// 					fieldQuery = { [field]: { $ne: filter.value } };
+// 					break;
+// 				default:
+// 					break;
+// 			}
+// 			if (filter.matchMode === "any") {
+// 				orQueries.push(fieldQuery);
+// 			} else {
+// 				// Assume 'all' as default matchMode
+// 				Object.assign(query, fieldQuery);
+// 			}
+// 		});
+
+// 		if (orQueries.length > 0) {
+// 			query = { $or: orQueries };
+// 		}
 
 // 		// Fetch the products with pagination, sorting, and filtering
 // 		const products = await Product.find(query)
