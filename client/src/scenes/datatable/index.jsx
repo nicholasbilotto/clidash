@@ -4,6 +4,8 @@ import { Column } from "primereact/column";
 import { TabView, TabPanel } from "primereact/tabview";
 import { useGetProductsTableQuery } from "state/api";
 import { Dropdown } from "primereact/dropdown"; // Import Dropdown
+import { InputText } from "primereact/inputtext";
+import { FilterMatchMode } from "primereact/api";
 import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.css";
 import "primeicons/primeicons.css";
@@ -14,7 +16,12 @@ const ProductTablePrime = () => {
 	const [pageSize, setPageSize] = useState(100);
 	const [expandedRows, setExpandedRows] = useState(null);
 	const [sort, setSort] = useState({ field: "ProductName", order: 1 });
-	const [filters, setFilters] = useState({});
+	const [filters, setFilters] = useState({
+		Client: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+		Category: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+		ProductName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+	});
+	const [globalFilterValue, setGlobalFilterValue] = useState("");
 
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
@@ -39,6 +46,20 @@ const ProductTablePrime = () => {
 		{ label: "1000", value: 1000 },
 	];
 
+	const onFilterChange = (e, field) => {
+		let newFilters = { ...filters };
+		newFilters[field] = { value: e.target.value };
+		setFilters(newFilters);
+	};
+
+	const onGlobalFilterChange = (e) => {
+		const value = e.target.value;
+		let _filters = { ...filters };
+		_filters["global"] = { ..._filters["global"], value: value }; // Assuming 'global' is the key for global filter
+		setFilters(_filters);
+		setGlobalFilterValue(value);
+	};
+
 	const header = (
 		<div
 			style={{
@@ -47,7 +68,17 @@ const ProductTablePrime = () => {
 				alignItems: "center",
 			}}
 		>
-			<span className="text-xl text-900 font-bold">Products</span>
+			<div style={{ display: "flex", alignItems: "center" }}>
+				<span className="text-xl text-900 font-bold">Products</span>
+				<span className="p-input-icon-left" style={{ marginLeft: "16px" }}>
+					<i className="pi pi-search" />
+					<InputText
+						value={globalFilterValue}
+						onChange={onGlobalFilterChange}
+						placeholder="Keyword Search"
+					/>
+				</span>
+			</div>
 			<div style={{ display: "flex", alignItems: "center" }}>
 				<label htmlFor="itemsPerPage" style={{ paddingRight: "8px" }}>
 					Items per page
@@ -65,14 +96,6 @@ const ProductTablePrime = () => {
 	);
 
 	const footer = `${products ? products.length : 0} of  ${totalProducts}`;
-
-	const handleFilterChange = (e) => {
-		const { filters } = e;
-		// Here, you may need to adjust the format of 'filters' to match your backend expectations
-		// if necessary. For now, we'll just set it directly.
-		setFilters(filters);
-		refetch();
-	};
 
 	const rowExpansionTemplate = (data) => {
 		return (
@@ -333,7 +356,9 @@ const ProductTablePrime = () => {
 				sortField={sort.field}
 				sortOrder={sort.order}
 				onSort={(e) => setSort({ field: e.sortField, order: e.sortOrder })}
-				onFilter={handleFilterChange} // This line is handling filter changes
+				filters={filters}
+				filterDisplay="row"
+				globalFilterFields={["Client", "Category", "ProductName"]} // specify the fields that can be searched globally
 			>
 				<Column expander style={{ width: "3em" }} />
 				<Column
@@ -341,24 +366,60 @@ const ProductTablePrime = () => {
 					header="Client"
 					filter
 					filterPlaceholder="Search by Client"
-					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
+					filterElement={
+						<InputText
+							onChange={(e) =>
+								setFilters({
+									...filters,
+									Client: {
+										value: e.target.value,
+										matchMode: FilterMatchMode.STARTS_WITH,
+									},
+								})
+							}
+						/>
+					}
 				/>
 				<Column
 					field="Category"
 					header="Category"
 					filter
 					filterPlaceholder="Search by Category"
-					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
+					filterElement={
+						<InputText
+							onChange={(e) =>
+								setFilters({
+									...filters,
+									Category: {
+										value: e.target.value,
+										matchMode: FilterMatchMode.STARTS_WITH,
+									},
+								})
+							}
+						/>
+					}
 				/>
 				<Column
 					field="ProductName"
 					header="Product Name"
 					filter
 					filterPlaceholder="Search by Product Name"
-					filterMatchMode="contains" // This line specifies how the filter should behave
 					sortable
+					filterElement={
+						<InputText
+							onChange={(e) =>
+								setFilters({
+									...filters,
+									ProductName: {
+										value: e.target.value,
+										matchMode: FilterMatchMode.STARTS_WITH,
+									},
+								})
+							}
+						/>
+					}
 				/>
 			</DataTable>
 		</div>

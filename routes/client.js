@@ -9,8 +9,8 @@ import {
 
 const router = express.Router();
 
-router.get("/products", jwtMiddleware, getProducts);
-router.get("/contracts", jwtMiddleware, getContracts);
-router.get("/royalties", jwtMiddleware, getRoyalties);
+router.get("/products", getProducts);
+router.get("/contracts", getContracts);
+router.get("/royalties", getRoyalties);
 
 export default router;
