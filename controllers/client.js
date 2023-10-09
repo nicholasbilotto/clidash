@@ -28,7 +28,13 @@ export const getProducts = async (req, res) => {
 	console.log("Received query params:", req.query);
 
 	try {
-		const { page = 1, pageSize = 100, sort, filters } = req.query;
+		const {
+			page = 1,
+			pageSize = 100,
+			sort,
+			filters,
+			globalFilter,
+		} = req.query;
 
 		// Convert page and pageSize to numbers
 		const pageNum = Number(page);
@@ -57,9 +63,6 @@ export const getProducts = async (req, res) => {
 				console.error("Error parsing filters parameter", e);
 			}
 		}
-
-		console.log("Parsed Sort Parameters:", parsedSort);
-		console.log("Parsed Filter Parameters:", parsedFilters);
 
 		// Initialize the query object
 		let query = {};
@@ -102,6 +105,23 @@ export const getProducts = async (req, res) => {
 				$and: [...(query.$and || []), fieldQuery],
 			};
 		});
+
+		if (globalFilter) {
+			const regex = new RegExp(globalFilter, "i"); // case-insensitive regex
+			const globalQuery = {
+				$or: [
+					{ Client: { $regex: regex } },
+					{ Category: { $regex: regex } },
+					{ ProductName: { $regex: regex } },
+					// ...add other fields as needed
+				],
+			};
+
+			// Merge the globalQuery into the main query using $and
+			query = {
+				$and: [...(query.$and || []), globalQuery],
+			};
+		}
 
 		// Fetch the products with pagination, sorting, and filtering
 		const products = await Product.find(query)

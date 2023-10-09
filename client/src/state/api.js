@@ -32,7 +32,7 @@ export const api = createApi({
 		}),
 		getProductsTable: build.query({
 			query: (params) => {
-				const { page, pageSize, sort, filters } = params;
+				const { page, pageSize, sort, filters, globalFilter } = params;
 
 				// Construct URL with parameters
 				const urlParams = new URLSearchParams();
@@ -51,6 +51,11 @@ export const api = createApi({
 							? filters
 							: JSON.stringify(filters)
 					);
+				}
+
+				// Add globalFilter to URL parameters
+				if (globalFilter) {
+					urlParams.append("globalFilter", JSON.stringify(globalFilter));
 				}
 
 				return `client/products?${urlParams.toString()}`;
@@ -75,18 +80,3 @@ export const {
 	useGetContractsQuery,
 	useGetRoyaltiesQuery,
 } = api;
-
-// getProductsTable: build.query({
-// 	query: (params) => {
-// 		console.log("API Request Params:", params);
-// 		const query = new URLSearchParams({
-// 			...params,
-// 			sort:
-// 				typeof params.sort === "string"
-// 					? params.sort
-// 					: JSON.stringify(params.sort),
-// 		}).toString();
-// 		return `client/products?${query}`;
-// 	},
-// 	providesTags: ["Products"],
-// }),
