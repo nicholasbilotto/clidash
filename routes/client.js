@@ -13,6 +13,6 @@ const router = express.Router();
 router.get("/products", getProducts);
 router.get("/contracts", getContracts);
 router.get("/royalties", getRoyalties);
-router.get("/client/export-products", exportFilteredProducts);
+router.get("/export-products", exportFilteredProducts);
 
 export default router;

@@ -32,18 +32,19 @@ const ProductTablePrime = () => {
 		globalFilter: globalFilterValue,
 	};
 
+	const {
+		data: ordersData,
+		error: ordersError,
+		isLoading: ordersLoading,
+		refetch: ordersRefetch,
+	} = useExportProductsQuery(queryParam);
+
 	const { data, error, isLoading, refetch } =
 		useGetProductsTableQuery(queryParam);
 
-	const {
-		data: exportData,
-		error: exportError,
-		isLoading: exportLoading,
-		refetch: exportRefetch,
-	} = useExportProductsQuery(queryParam, { skip: true }); // Set to skip initially so it doesn't run on component mount
-
 	const products = data?.docs || [];
 	const totalProducts = data?.totalDocs || 0;
+	const exportableProducts = ordersData?.docs || [];
 
 	const itemsPerPageOptions = [
 		{ label: "100", value: 100 },
@@ -79,24 +80,13 @@ const ProductTablePrime = () => {
 	}));
 
 	const exportPdf = () => {
-		exportRefetch() // Trigger the exportProducts endpoint
-			.then((response) => {
-				// Assuming the response contains the data to be exported
-				const exportData = response.data;
-				if (exportData) {
-					import("jspdf").then((jsPDF) => {
-						import("jspdf-autotable").then(() => {
-							const doc = new jsPDF.default(0, 0);
-							doc.autoTable(exportColumns, exportData);
-							doc.save("products.pdf");
-						});
-					});
-				}
-			})
-			.catch((error) => {
-				console.error("Export failed:", error.message);
-				// Handle export error (e.g., show a message to the user)
+		import("jspdf").then((jsPDF) => {
+			import("jspdf-autotable").then(() => {
+				const doc = new jsPDF.default(0, 0);
+				doc.autoTable(exportColumns, exportableProducts); // updated to use exportableProducts
+				doc.save("products.pdf");
 			});
+		});
 	};
 
 	const header = (
@@ -109,14 +99,14 @@ const ProductTablePrime = () => {
 		>
 			<div style={{ display: "flex", alignItems: "center" }}>
 				<span className="text-xl text-900 font-bold">Products</span>
-				<span className="p-input-icon-left" style={{ marginLeft: "16px" }}>
+				{/* <span className="p-input-icon-left" style={{ marginLeft: "16px" }}>
 					<i className="pi pi-search" />
 					<InputText
 						value={globalFilterValue}
 						onChange={onGlobalFilterChange}
 						placeholder="Keyword Search"
 					/>
-				</span>
+				</span> */}
 			</div>
 			<div style={{ display: "flex", alignItems: "center" }}>
 				<label htmlFor="itemsPerPage" style={{ paddingRight: "8px" }}>
