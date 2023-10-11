@@ -142,6 +142,105 @@ export const getProducts = async (req, res) => {
 	}
 };
 
+export const exportFilteredProducts = async (req, res) => {
+	console.log("Received query params:", req.query);
+
+	try {
+		const { sort, filters, globalFilter } = req.query;
+
+		// Decode and then parse sort and filters parameters
+		let parsedSort = {};
+		let parsedFilters = {};
+
+		if (sort) {
+			try {
+				const decodedSort = JSON.parse(decodeURIComponent(sort));
+				parsedSort[decodedSort.field] = decodedSort.order;
+			} catch (e) {
+				console.error("Error parsing sort parameter", e);
+			}
+		}
+
+		if (filters) {
+			try {
+				parsedFilters = JSON.parse(decodeURIComponent(filters));
+			} catch (e) {
+				console.error("Error parsing filters parameter", e);
+			}
+		}
+
+		// Initialize the query object
+		let query = {};
+
+		Object.keys(parsedFilters).forEach((field) => {
+			const filter = parsedFilters[field];
+			let fieldQuery;
+			switch (filter.matchMode) {
+				case "startsWith":
+					fieldQuery = {
+						[field]: { $regex: `^${filter.value}`, $options: "i" },
+					};
+					break;
+				case "contains":
+					fieldQuery = {
+						[field]: { $regex: filter.value, $options: "i" },
+					};
+					break;
+				case "notContains":
+					fieldQuery = {
+						[field]: { $not: { $regex: filter.value, $options: "i" } },
+					};
+					break;
+				case "endsWith":
+					fieldQuery = {
+						[field]: { $regex: `${filter.value}$`, $options: "i" },
+					};
+					break;
+				case "equals":
+					fieldQuery = { [field]: filter.value };
+					break;
+				case "notEquals":
+					fieldQuery = { [field]: { $ne: filter.value } };
+					break;
+				default:
+					break;
+			}
+			// Merge the field query into the main query using $and
+			query = {
+				$and: [...(query.$and || []), fieldQuery],
+			};
+		});
+
+		if (globalFilter) {
+			const regex = new RegExp(globalFilter, "i"); // case-insensitive regex
+			const globalQuery = {
+				$or: [
+					{ Client: { $regex: regex } },
+					{ Category: { $regex: regex } },
+					{ ProductName: { $regex: regex } },
+					// ...add other fields as needed
+				],
+			};
+
+			// Merge the globalQuery into the main query using $and
+			query = {
+				$and: [...(query.$and || []), globalQuery],
+			};
+		}
+
+		// Fetch all the products with sorting and filtering, but without pagination
+		const products = await Product.find(query).sort(parsedSort);
+
+		console.log("Fetched Products:", products);
+
+		// Send back the products
+		res.status(200).json({ docs: products });
+	} catch (error) {
+		console.error("Error in Export Filtered Products", error);
+		res.status(500).json({ message: error.message });
+	}
+};
+
 // export const getProducts = async (req, res) => {
 // 	console.log("Received query params:", req.query);
 

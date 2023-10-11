@@ -3,7 +3,8 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { TabView, TabPanel } from "primereact/tabview";
 import { useGetProductsTableQuery } from "state/api";
-import { Dropdown } from "primereact/dropdown"; // Import Dropdown
+import { useExportProductsQuery } from "state/api";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { FilterMatchMode } from "primereact/api";
@@ -34,6 +35,13 @@ const ProductTablePrime = () => {
 	const { data, error, isLoading, refetch } =
 		useGetProductsTableQuery(queryParam);
 
+	const {
+		data: exportData,
+		error: exportError,
+		isLoading: exportLoading,
+		refetch: exportRefetch,
+	} = useExportProductsQuery(queryParam, { skip: true }); // Set to skip initially so it doesn't run on component mount
+
 	const products = data?.docs || [];
 	const totalProducts = data?.totalDocs || 0;
 
@@ -61,6 +69,7 @@ const ProductTablePrime = () => {
 		{ field: "Client", header: "Client" },
 		{ field: "Category", header: "Category" },
 		{ field: "ProductName", header: "Product Name" },
+
 		// ... add other columns as needed
 	];
 
@@ -70,13 +79,24 @@ const ProductTablePrime = () => {
 	}));
 
 	const exportPdf = () => {
-		import("jspdf").then((jsPDF) => {
-			import("jspdf-autotable").then(() => {
-				const doc = new jsPDF.default(0, 0);
-				doc.autoTable(exportColumns, products);
-				doc.save("products.pdf");
+		exportRefetch() // Trigger the exportProducts endpoint
+			.then((response) => {
+				// Assuming the response contains the data to be exported
+				const exportData = response.data;
+				if (exportData) {
+					import("jspdf").then((jsPDF) => {
+						import("jspdf-autotable").then(() => {
+							const doc = new jsPDF.default(0, 0);
+							doc.autoTable(exportColumns, exportData);
+							doc.save("products.pdf");
+						});
+					});
+				}
+			})
+			.catch((error) => {
+				console.error("Export failed:", error.message);
+				// Handle export error (e.g., show a message to the user)
 			});
-		});
 	};
 
 	const header = (

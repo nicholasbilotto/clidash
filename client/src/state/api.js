@@ -33,7 +33,6 @@ export const api = createApi({
 		getProductsTable: build.query({
 			query: (params) => {
 				const { page, pageSize, sort, filters, globalFilter } = params;
-
 				// Construct URL with parameters
 				const urlParams = new URLSearchParams();
 				urlParams.append("page", page);
@@ -52,7 +51,6 @@ export const api = createApi({
 							: JSON.stringify(filters)
 					);
 				}
-
 				// Add globalFilter to URL parameters
 				if (globalFilter) {
 					urlParams.append("globalFilter", JSON.stringify(globalFilter));
@@ -66,9 +64,33 @@ export const api = createApi({
 			query: () => "client/contracts",
 			providesTags: ["Contracts"],
 		}),
-		getRoyalties: build.query({
-			query: () => "client/royalties",
-			providesTags: ["Royalties"],
+		exportProducts: build.query({
+			query: (params) => {
+				const { sort, filters, globalFilter } = params;
+				// Construct URL with parameters
+				const urlParams = new URLSearchParams();
+				urlParams.append(
+					"sort",
+					typeof sort === "string" ? sort : JSON.stringify(sort)
+				);
+
+				// Add filters to URL parameters
+				if (filters) {
+					urlParams.append(
+						"filters",
+						typeof filters === "string"
+							? filters
+							: JSON.stringify(filters)
+					);
+				}
+				// Add globalFilter to URL parameters
+				if (globalFilter) {
+					urlParams.append("globalFilter", JSON.stringify(globalFilter));
+				}
+
+				return `client/export-products?${urlParams.toString()}`;
+			},
+			providesTags: ["Products"],
 		}),
 	}),
 });
@@ -79,4 +101,5 @@ export const {
 	useGetProductsTableQuery,
 	useGetContractsQuery,
 	useGetRoyaltiesQuery,
+	useExportProductsQuery,
 } = api;

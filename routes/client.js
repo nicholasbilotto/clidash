@@ -5,6 +5,7 @@ import {
 	getProducts,
 	getContracts,
 	getRoyalties,
+	exportFilteredProducts,
 } from "../controllers/client.js";
 
 const router = express.Router();
@@ -12,5 +13,6 @@ const router = express.Router();
 router.get("/products", getProducts);
 router.get("/contracts", getContracts);
 router.get("/royalties", getRoyalties);
+router.get("/client/export-products", exportFilteredProducts);
 
 export default router;
