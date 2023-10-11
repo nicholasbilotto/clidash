@@ -68,8 +68,13 @@ const ProductTablePrime = () => {
 
 	const cols = [
 		{ field: "Client", header: "Client" },
-		{ field: "Category", header: "Category" },
 		{ field: "ProductName", header: "Product Name" },
+		{ field: "Category", header: "Category" },
+		// { field: "Url", header: "URL" },
+		// { field: "ISBN", header: "ISBN" },
+		// { field: "ISSN", header: "ISSN" },
+		// { field: "PublicationType", header: "Publication Type" },
+		// { field: "FirstYearPublished", header: "First Year Published" },
 
 		// ... add other columns as needed
 	];
@@ -79,14 +84,12 @@ const ProductTablePrime = () => {
 		dataKey: col.field,
 	}));
 
-	const exportPdf = () => {
-		import("jspdf").then((jsPDF) => {
-			import("jspdf-autotable").then(() => {
-				const doc = new jsPDF.default(0, 0);
-				doc.autoTable(exportColumns, exportableProducts); // updated to use exportableProducts
-				doc.save("products.pdf");
-			});
-		});
+	const exportPdf = async () => {
+		const jsPDF = await import("jspdf");
+		const autoTable = await import("jspdf-autotable");
+		const doc = new jsPDF.default(0, 0);
+		doc.autoTable(exportColumns, exportableProducts);
+		doc.save("products.pdf");
 	};
 
 	const header = (

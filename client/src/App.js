@@ -35,12 +35,12 @@ function App() {
 							<Route path="/dashboard" element={<Dashboard />} />
 							<Route path="/overview" element={<Overview />} />
 							<Route path="/breakdown" element={<Breakdown />} />
-							<Route path="/products" element={<Products />} />
+							<Route path="/products" element={<DataTable />} />
 							<Route path="/airtable" element={<AirTable />} />
 							<Route path="/contracts" element={<Contracts />} />
 							<Route path="/royalties" element={<Royalties />} />
 							<Route path="/royaltyform" element={<RoyaltyForm />} />
-							<Route path="/datatable" element={<DataTable />} />
+							{/* <Route path="/datatable" element={<DataTable />} /> */}
 							<Route path="/admin" element={<Admin />} />
 						</Route>
 					</Routes>
