@@ -23,6 +23,42 @@ const ProductTablePrime = () => {
 
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
+	// Options for the 'Client' dropdown filter
+	const clientFilterItems = [
+		"Beard Group",
+		"Cherokee Media Group",
+		"MJH",
+		"Rodman Media",
+		"SAE",
+		"SPIE",
+	].map((client) => ({ label: client, value: client }));
+
+	// Options for the 'Category' dropdown filter
+	const categoryFilterItems = [
+		"Aerospace",
+		"Automotive",
+		"Business",
+		"Clinical Research",
+		"Computer Science",
+		"Dental Health",
+		"Electronics",
+		"Energy",
+		"Fabrics and Textiles",
+		"Food and Nutrition",
+		"Health Care",
+		"Labels and Packaging",
+		"Legal",
+		"Lifestyle",
+		"Machinery",
+		"Manufacturing",
+		"Medical",
+		"Medical Imaging",
+		"Optics",
+		"Paints and Coatings",
+		"Pharma",
+		"Veterinary Science",
+	].map((category) => ({ label: category, value: category }));
+
 	// Construct query parameters object
 	const queryParam = {
 		page: page,
@@ -70,13 +106,6 @@ const ProductTablePrime = () => {
 		{ field: "Client", header: "Client" },
 		{ field: "ProductName", header: "Product Name" },
 		{ field: "Category", header: "Category" },
-		// { field: "Url", header: "URL" },
-		// { field: "ISBN", header: "ISBN" },
-		// { field: "ISSN", header: "ISSN" },
-		// { field: "PublicationType", header: "Publication Type" },
-		// { field: "FirstYearPublished", header: "First Year Published" },
-
-		// ... add other columns as needed
 	];
 
 	const exportColumns = cols.map((col) => ({
@@ -90,6 +119,60 @@ const ProductTablePrime = () => {
 		const doc = new jsPDF.default(0, 0);
 		doc.autoTable(exportColumns, exportableProducts);
 		doc.save("products.pdf");
+	};
+
+	const clientFilterTemplate = (options) => {
+		return (
+			<Dropdown
+				value={options.value}
+				options={clientFilterItems}
+				onChange={(e) => options.filterApplyCallback(e.value)}
+				placeholder="Select a Client"
+				className="p-column-filter"
+				showClear
+				style={{ minWidth: "12rem" }}
+			/>
+		);
+	};
+
+	const categoryFilterTemplate = (options) => {
+		return (
+			<Dropdown
+				value={options.value}
+				options={categoryFilterItems}
+				onChange={(e) => options.filterApplyCallback(e.value)}
+				placeholder="Select a Category"
+				className="p-column-filter"
+				showClear
+				style={{ minWidth: "12rem" }}
+			/>
+		);
+	};
+
+	const onClientFilterChange = (e) => {
+		let newFilters = { ...filters };
+		if (e.value) {
+			newFilters["Client"] = {
+				value: e.value,
+				matchMode: FilterMatchMode.CONTAINS,
+			};
+		} else {
+			delete newFilters["Client"];
+		}
+		setFilters(newFilters);
+	};
+
+	const onCategoryFilterChange = (e) => {
+		let newFilters = { ...filters };
+		if (e.value) {
+			newFilters["Category"] = {
+				value: e.value,
+				matchMode: FilterMatchMode.CONTAINS,
+			};
+		} else {
+			delete newFilters["Category"];
+		}
+		setFilters(newFilters);
 	};
 
 	const header = (
@@ -551,36 +634,48 @@ const ProductTablePrime = () => {
 				<Column
 					field="Client"
 					header="Client"
+					style={{ width: "25%" }}
 					filter
-					showFilterMenu={false}
 					filterPlaceholder="Search by Client"
+					showFilterMenu={false}
+					showClearButton={false}
 					sortable
 					filterElement={
-						<InputText
-							onChange={(e) => onFilterChange(e, "Client")}
-							placeholder="Search by Client"
+						<Dropdown
+							value={filters.Client ? filters.Client.value : null}
+							options={clientFilterItems}
+							onChange={onClientFilterChange}
+							placeholder="Select a Client"
+							showClear
 						/>
 					}
 				/>
 				<Column
 					field="Category"
 					header="Category"
+					style={{ width: "25%" }}
 					filter
-					showFilterMenu={false}
 					filterPlaceholder="Search by Category"
+					showFilterMenu={false}
+					showClearButton={false}
 					sortable
 					filterElement={
-						<InputText
-							onChange={(e) => onFilterChange(e, "Category")}
-							placeholder="Search by Category"
+						<Dropdown
+							value={filters.Category ? filters.Category.value : null}
+							options={categoryFilterItems}
+							onChange={onCategoryFilterChange}
+							placeholder="Select a Category"
+							showClear
 						/>
 					}
 				/>
 				<Column
 					field="ProductName"
 					header="Product Name"
+					// style={{ width: "40%" }}
 					filter
 					showFilterMenu={false}
+					showClearButton={false}
 					filterPlaceholder="Search by Product Name"
 					sortable
 					filterElement={
