@@ -59,6 +59,11 @@ const ProductTablePrime = () => {
 
 	// **************************************************************** FILTERING ********************************************************************
 	// Options for the 'Client' dropdown filter
+
+	useEffect(() => {
+		console.log("Filters updated: ", filters);
+	}, [filters]);
+
 	const clientFilterItems = [
 		"Beard Group",
 		"Cherokee Media Group",
@@ -100,7 +105,7 @@ const ProductTablePrime = () => {
 		"Journal",
 		"Magazine",
 		"Newsletter",
-		"Video",
+		"Video ",
 		"Webinar",
 		"eBook",
 		"eConference Session",
@@ -111,7 +116,7 @@ const ProductTablePrime = () => {
 		let newFilters = { ...filters };
 		newFilters[field] = {
 			value: e.target.value,
-			matchMode: FilterMatchMode.CONTAINS,
+			matchMode: FilterMatchMode.IN,
 		};
 		setFilters(newFilters);
 	};
@@ -138,10 +143,10 @@ const ProductTablePrime = () => {
 		if (e.value) {
 			newFilters["Category"] = {
 				value: e.value,
-				matchMode: FilterMatchMode.IN,
+				matchMode: FilterMatchMode.EQUALS,
 			};
 		} else {
-			delete newFilters["PublicationType"];
+			delete newFilters["Category"];
 		}
 		setFilters(newFilters);
 	};
@@ -151,7 +156,7 @@ const ProductTablePrime = () => {
 		if (e.value) {
 			newFilters["PublicationType"] = {
 				value: e.value,
-				matchMode: FilterMatchMode.IN,
+				matchMode: FilterMatchMode.EQUALS,
 			};
 		} else {
 			delete newFilters["PublicationType"];
@@ -669,7 +674,7 @@ const ProductTablePrime = () => {
 					showClearButton={false}
 					sortable
 					filterElement={
-						<MultiSelect
+						<Dropdown
 							value={filters.Category ? filters.Category.value : null}
 							options={categoryFilterItems}
 							onChange={onCategoryFilterChange}
@@ -689,7 +694,7 @@ const ProductTablePrime = () => {
 					showClearButton={false}
 					sortable
 					filterElement={
-						<MultiSelect
+						<Dropdown
 							value={
 								filters.PublicationType
 									? filters.PublicationType.value
