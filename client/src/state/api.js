@@ -64,6 +64,10 @@ export const api = createApi({
 			query: () => "client/contracts",
 			providesTags: ["Contracts"],
 		}),
+		getRoyalties: build.query({
+			query: () => "client/royalties",
+			providesTags: ["Royalties"],
+		}),
 		exportProducts: build.query({
 			query: (params) => {
 				const { sort, filters, globalFilter } = params;

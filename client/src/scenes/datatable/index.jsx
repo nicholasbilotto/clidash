@@ -12,17 +12,52 @@ import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.css";
 import "primeicons/primeicons.css";
 import "../../App.css";
+import { MultiSelect } from "primereact/multiselect";
 
 const ProductTablePrime = () => {
+	// **************************************************************** DECLARATIONS *******************************************************************
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(100);
 	const [expandedRows, setExpandedRows] = useState(null);
 	const [sort, setSort] = useState({ field: "ProductName", order: 1 });
 	const [filters, setFilters] = useState({});
 	const [globalFilterValue, setGlobalFilterValue] = useState();
-
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
 
+	// Construct query parameters object
+	const queryParam = {
+		page: page,
+		pageSize: pageSize,
+		sort: sortParam,
+		filters: encodeURIComponent(JSON.stringify(filters)),
+		globalFilter: globalFilterValue,
+	};
+
+	// Construct the Products Object
+	const { data, error, isLoading, refetch } =
+		useGetProductsTableQuery(queryParam);
+
+	// Construct the Export Object
+	const {
+		data: ordersData,
+		error: ordersError,
+		isLoading: ordersLoading,
+		refetch: ordersRefetch,
+	} = useExportProductsQuery(queryParam);
+
+	//Final Declarations
+	const products = data?.docs || [];
+	const totalProducts = data?.totalDocs || 0;
+	const exportableProducts = ordersData?.docs || [];
+
+	const itemsPerPageOptions = [
+		{ label: "100", value: 100 },
+		{ label: "250", value: 250 },
+		{ label: "500", value: 500 },
+		{ label: "1000", value: 1000 },
+	];
+
+	// **************************************************************** FILTERING ********************************************************************
 	// Options for the 'Client' dropdown filter
 	const clientFilterItems = [
 		"Beard Group",
@@ -59,35 +94,18 @@ const ProductTablePrime = () => {
 		"Veterinary Science",
 	].map((category) => ({ label: category, value: category }));
 
-	// Construct query parameters object
-	const queryParam = {
-		page: page,
-		pageSize: pageSize,
-		sort: sortParam,
-		filters: encodeURIComponent(JSON.stringify(filters)),
-		globalFilter: globalFilterValue,
-	};
-
-	const {
-		data: ordersData,
-		error: ordersError,
-		isLoading: ordersLoading,
-		refetch: ordersRefetch,
-	} = useExportProductsQuery(queryParam);
-
-	const { data, error, isLoading, refetch } =
-		useGetProductsTableQuery(queryParam);
-
-	const products = data?.docs || [];
-	const totalProducts = data?.totalDocs || 0;
-	const exportableProducts = ordersData?.docs || [];
-
-	const itemsPerPageOptions = [
-		{ label: "100", value: 100 },
-		{ label: "250", value: 250 },
-		{ label: "500", value: 500 },
-		{ label: "1000", value: 1000 },
-	];
+	const pubTypeFilterItems = [
+		"Book",
+		"Conference Session",
+		"Journal",
+		"Magazine",
+		"Newsletter",
+		"Video",
+		"Webinar",
+		"eBook",
+		"eConference Session",
+		"eJournal",
+	].map((category) => ({ label: category, value: category }));
 
 	const onFilterChange = (e, field) => {
 		let newFilters = { ...filters };
@@ -100,53 +118,6 @@ const ProductTablePrime = () => {
 
 	const onGlobalFilterChange = (e) => {
 		setGlobalFilterValue(e.target.value);
-	};
-
-	const cols = [
-		{ field: "Client", header: "Client" },
-		{ field: "ProductName", header: "Product Name" },
-		{ field: "Category", header: "Category" },
-	];
-
-	const exportColumns = cols.map((col) => ({
-		title: col.header,
-		dataKey: col.field,
-	}));
-
-	const exportPdf = async () => {
-		const jsPDF = await import("jspdf");
-		const autoTable = await import("jspdf-autotable");
-		const doc = new jsPDF.default(0, 0);
-		doc.autoTable(exportColumns, exportableProducts);
-		doc.save("products.pdf");
-	};
-
-	const clientFilterTemplate = (options) => {
-		return (
-			<Dropdown
-				value={options.value}
-				options={clientFilterItems}
-				onChange={(e) => options.filterApplyCallback(e.value)}
-				placeholder="Select a Client"
-				className="p-column-filter"
-				showClear
-				style={{ minWidth: "12rem" }}
-			/>
-		);
-	};
-
-	const categoryFilterTemplate = (options) => {
-		return (
-			<Dropdown
-				value={options.value}
-				options={categoryFilterItems}
-				onChange={(e) => options.filterApplyCallback(e.value)}
-				placeholder="Select a Category"
-				className="p-column-filter"
-				showClear
-				style={{ minWidth: "12rem" }}
-			/>
-		);
 	};
 
 	const onClientFilterChange = (e) => {
@@ -167,14 +138,48 @@ const ProductTablePrime = () => {
 		if (e.value) {
 			newFilters["Category"] = {
 				value: e.value,
-				matchMode: FilterMatchMode.CONTAINS,
+				matchMode: FilterMatchMode.IN,
 			};
 		} else {
-			delete newFilters["Category"];
+			delete newFilters["PublicationType"];
 		}
 		setFilters(newFilters);
 	};
 
+	const onPubTypeFilterChange = (e) => {
+		let newFilters = { ...filters };
+		if (e.value) {
+			newFilters["PublicationType"] = {
+				value: e.value,
+				matchMode: FilterMatchMode.IN,
+			};
+		} else {
+			delete newFilters["PublicationType"];
+		}
+		setFilters(newFilters);
+	};
+
+	// ******************************************************************* EXPORTING *****************************************************************
+	const cols = [
+		{ field: "Client", header: "Client" },
+		{ field: "ProductName", header: "Product Name" },
+		{ field: "Category", header: "Category" },
+	];
+
+	const exportColumns = cols.map((col) => ({
+		title: col.header,
+		dataKey: col.field,
+	}));
+
+	const exportPdf = async () => {
+		const jsPDF = await import("jspdf");
+		const autoTable = await import("jspdf-autotable");
+		const doc = new jsPDF.default(0, 0);
+		doc.autoTable(exportColumns, exportableProducts);
+		doc.save("products.pdf");
+	};
+
+	// **************************************************************** HEADER / FOOTER **************************************************************
 	const header = (
 		<div
 			style={{
@@ -220,6 +225,7 @@ const ProductTablePrime = () => {
 
 	const footer = `${products ? products.length : 0} of  ${totalProducts}`;
 
+	// **************************************************************** ROW EXPANSION ****************************************************************
 	const rowExpansionTemplate = (data) => {
 		return (
 			<div className="p-grid p-dir-col">
@@ -603,6 +609,8 @@ const ProductTablePrime = () => {
 		);
 	};
 
+	// ******************************************************************* RETURN *******************************************************************
+
 	return (
 		<div>
 			{error && <p>Error: {error.message}</p>}
@@ -634,7 +642,7 @@ const ProductTablePrime = () => {
 				<Column
 					field="Client"
 					header="Client"
-					style={{ width: "25%" }}
+					style={{ width: "15%" }}
 					filter
 					filterPlaceholder="Search by Client"
 					showFilterMenu={false}
@@ -646,6 +654,7 @@ const ProductTablePrime = () => {
 							options={clientFilterItems}
 							onChange={onClientFilterChange}
 							placeholder="Select a Client"
+							display="chip"
 							showClear
 						/>
 					}
@@ -653,18 +662,43 @@ const ProductTablePrime = () => {
 				<Column
 					field="Category"
 					header="Category"
-					style={{ width: "25%" }}
+					style={{ width: "15%" }}
 					filter
 					filterPlaceholder="Search by Category"
 					showFilterMenu={false}
 					showClearButton={false}
 					sortable
 					filterElement={
-						<Dropdown
+						<MultiSelect
 							value={filters.Category ? filters.Category.value : null}
 							options={categoryFilterItems}
 							onChange={onCategoryFilterChange}
 							placeholder="Select a Category"
+							display="chip"
+							showClear
+						/>
+					}
+				/>
+				<Column
+					field="PublicationType"
+					header="Publication Type"
+					style={{ width: "15%" }}
+					filter
+					filterPlaceholder="Search by PubType"
+					showFilterMenu={false}
+					showClearButton={false}
+					sortable
+					filterElement={
+						<MultiSelect
+							value={
+								filters.PublicationType
+									? filters.PublicationType.value
+									: null
+							}
+							options={pubTypeFilterItems}
+							onChange={onPubTypeFilterChange}
+							placeholder="Select a PubType"
+							display="chip"
 							showClear
 						/>
 					}

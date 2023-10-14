@@ -97,6 +97,9 @@ export const getProducts = async (req, res) => {
 				case "notEquals":
 					fieldQuery = { [field]: { $ne: filter.value } };
 					break;
+				case "in":
+					fieldQuery = { [field]: { $in: filter.value } };
+					break;
 				default:
 					break;
 			}
