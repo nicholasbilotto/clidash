@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { TabView, TabPanel } from "primereact/tabview";
@@ -23,6 +23,7 @@ const ProductTablePrime = () => {
 	const [filters, setFilters] = useState({});
 	const [globalFilterValue, setGlobalFilterValue] = useState();
 	const sortParam = encodeURIComponent(JSON.stringify(sort));
+	const dt = useRef(null);
 
 	// Construct query parameters object
 	const queryParam = {
@@ -184,6 +185,13 @@ const ProductTablePrime = () => {
 		doc.save("products.pdf");
 	};
 
+	// const exportCSVWithAllFields = () => {
+	// 	exportCSV({
+	// 		data: products,
+	// 		fields: exportColumns,
+	// 	});
+	// };
+
 	// **************************************************************** HEADER / FOOTER **************************************************************
 	const header = (
 		<div
@@ -216,14 +224,21 @@ const ProductTablePrime = () => {
 					placeholder="Select"
 					style={{ width: "150px", marginRight: "8px" }}
 				/>
-				<Button
+				{/* <Button
+					type="button"
+					icon="pi pi-file-o"
+					rounded
+					onClick={exportCSVWithAllFields}
+					data-pr-tooltip="CSV"
+				/> */}
+				{/* <Button
 					type="button"
 					icon="pi pi-file-pdf"
 					className="p-button-warning"
 					rounded
 					onClick={exportPdf}
 					data-pr-tooltip="PDF"
-				/>
+				/> */}
 			</div>
 		</div>
 	);
@@ -620,6 +635,7 @@ const ProductTablePrime = () => {
 		<div>
 			{error && <p>Error: {error.message}</p>}
 			<DataTable
+				ref={dt}
 				value={products}
 				header={header}
 				footer={footer}
