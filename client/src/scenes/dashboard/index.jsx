@@ -18,13 +18,65 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import BreakdownChart from "components/BreakdownChart";
 import OverviewChart from "components/OverviewChart";
-import { useGetDashboardQuery } from "state/api";
+import { useGetRoyaltiesQuery } from "state/api";
 import StatBox from "components/StatBox";
 
 const Dashboard = () => {
 	const theme = useTheme();
 	const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-	const { data, isLoading } = useGetDashboardQuery();
+	const { data, isLoading } = useGetRoyaltiesQuery();
+
+	if (isLoading) return "Loading...";
+
+	const months = [
+		"JANUARY",
+		"FEBRUARY",
+		"MARCH",
+		"APRIL",
+		"MAY",
+		"JUNE",
+		"JULY",
+		"AUGUST",
+		"SEPTEMBER",
+		"OCTOBER",
+		"NOVEMBER",
+		"DECEMBER",
+	];
+
+	const currentMonthIndex = new Date().getMonth(); // Month is 0-indexed (0 for January, 1 for February, etc.)
+	const currentMonth = months[currentMonthIndex];
+
+	const previousMonth =
+		currentMonthIndex === 0 ? months[11] : months[currentMonthIndex - 1];
+
+	const yearlyRoyaltiesTotal = Math.round(
+		data.reduce((sum, item) => sum + (item.TOTAL || 0), 0)
+	);
+
+	const monthlyRoyalties = Math.round(
+		data.reduce((sum, item) => sum + (Number(item[currentMonth]) || 0), 0)
+	);
+
+	// Calculate the total royalties for the current and previous months
+
+	const previousMonthRoyalties = data.reduce(
+		(sum, item) => sum + (Number(item[previousMonth]) || 0),
+		0
+	);
+
+	// Calculate the percentage increase since last month
+	let percentageIncrease = 0;
+	if (previousMonthRoyalties > 0) {
+		percentageIncrease =
+			((monthlyRoyalties - previousMonthRoyalties) /
+				previousMonthRoyalties) *
+			100;
+	}
+
+	const formattedYearlyRoyalties = `$${yearlyRoyaltiesTotal.toLocaleString()}`;
+	const formattedMonthlyRoyalties = `$${monthlyRoyalties.toLocaleString()}`;
+
+	const formattedPercentageIncrease = `${percentageIncrease.toFixed(2)}%`;
 
 	const columns = [
 		{
@@ -93,9 +145,8 @@ const Dashboard = () => {
 				{/* ROW 1 */}
 				<StatBox
 					title="2022 Royalties YTD"
-					value="$2,179,259"
-					// increase="+14%"
-					// description="Since last month"
+					value={formattedYearlyRoyalties}
+					description="Since last year"
 					icon={
 						<Email
 							sx={{
@@ -107,8 +158,8 @@ const Dashboard = () => {
 				/>
 				<StatBox
 					title="Monthly Royalties"
-					value="$91,236.74"
-					increase="+85.56%"
+					value={formattedMonthlyRoyalties}
+					increase={formattedPercentageIncrease}
 					description="Since last month"
 					icon={
 						<PointOfSale
@@ -128,10 +179,9 @@ const Dashboard = () => {
 				>
 					<OverviewChart view="sales" isDashboard={true} />
 				</Box>
-				{/* <StatBox
+				<StatBox
 					title="Monthly Sales"
-					value={data && data.thisMonthStats.totalSales}
-					increase="+5%"
+					value={null}
 					description="Since last month"
 					icon={
 						<PersonAdd
@@ -144,9 +194,8 @@ const Dashboard = () => {
 				/>
 				<StatBox
 					title="Yearly Sales"
-					value={data && data.yearlySalesTotal}
-					increase="+43%"
-					description="Since last month"
+					value={null}
+					description="Since last year"
 					icon={
 						<Traffic
 							sx={{
@@ -155,7 +204,7 @@ const Dashboard = () => {
 							}}
 						/>
 					}
-				/> */}
+				/>
 
 				{/* ROW 2 */}
 				<Box

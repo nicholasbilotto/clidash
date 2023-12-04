@@ -63,34 +63,34 @@ const navItems = [
 		text: "Royalty Tracking",
 		icon: null,
 	},
-	{
-		text: "Royalties",
-		icon: <PointOfSaleOutlined />,
-	},
-	{
-		text: "RoyaltyForm",
-		icon: <ReceiptLongOutlined />,
-	},
 	// {
-	// 	text: "Daily",
-	// 	icon: <TodayOutlined />,
+	// 	text: "Royalties",
+	// 	icon: <PointOfSaleOutlined />,
 	// },
-	{
-		text: "Overview",
-		icon: <CalendarMonthOutlined />,
-	},
-	{
-		text: "Breakdown",
-		icon: <PieChartOutlined />,
-	},
-	{
-		text: "Insightly",
-		icon: null,
-	},
-	{
-		text: "Admin",
-		icon: <AdminPanelSettingsOutlined />,
-	},
+	// {
+	// 	text: "RoyaltyForm",
+	// 	icon: <ReceiptLongOutlined />,
+	// },
+	// // {
+	// // 	text: "Daily",
+	// // 	icon: <TodayOutlined />,
+	// // },
+	// {
+	// 	text: "Overview",
+	// 	icon: <CalendarMonthOutlined />,
+	// },
+	// {
+	// 	text: "Breakdown",
+	// 	icon: <PieChartOutlined />,
+	// },
+	// {
+	// 	text: "Insightly",
+	// 	icon: null,
+	// },
+	// {
+	// 	text: "Admin",
+	// 	icon: <AdminPanelSettingsOutlined />,
+	// },
 ];
 
 const Sidebar = ({

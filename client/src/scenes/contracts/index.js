@@ -6,17 +6,17 @@ import { useGetContractsQuery } from "state/api";
 const CustomToolbar = () => {
 	return (
 		<GridToolbarContainer>
-			<Button
+			{/* <Button
 				variant="contained"
 				color="primary"
 				size="small"
 				style={{ marginRight: 16 }}
 			>
 				New Contract
-			</Button>
-			<Button variant="outlined" color="primary" size="small">
+			</Button> */}
+			{/* <Button variant="outlined" color="primary" size="small">
 				Export
-			</Button>
+			</Button> */}
 			<GridToolbar />
 		</GridToolbarContainer>
 	);

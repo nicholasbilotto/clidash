@@ -166,31 +166,162 @@ const ProductTablePrime = () => {
 	};
 
 	// ******************************************************************* EXPORTING *****************************************************************
-	const cols = [
-		{ field: "Client", header: "Client" },
-		{ field: "ProductName", header: "Product Name" },
-		{ field: "Category", header: "Category" },
-	];
 
-	const exportColumns = cols.map((col) => ({
-		title: col.header,
-		dataKey: col.field,
-	}));
+	const exportCSV = () => {
+		// Prepare headers for CSV
+		const headers = [
+			"Client",
+			"ProductName",
+			"Category",
+			"PublicationType",
+			"ISBN",
+			"ISSN",
+			"Url",
+			"FirstYearPublished",
+			"DOI",
+			"Description",
+			"IssuesPerYear",
+			"PublicationFormats",
+			"OnlineContentFrequency",
+			"TopicsCovered",
+			"AudienceDescription",
+			"Circulation",
+			"AnnualTraffic",
+			"SubscriptionType",
+			"AnnualSubPrice",
+			"IndividualCopyPrice",
+			"NumberOfEvents",
+			"EventOne",
+			"EventOneDescription",
+			"EventOneRecording",
+			"EventTwo",
+			"EventTwoDescription",
+			"EventTwoRecording",
+			"EventThree",
+			"EventThreeDescription",
+			"EventThreeRecording",
+			"NumberOfNewsletters",
+			"NewsletterOne",
+			"NewsletterOneFormat",
+			"NewsletterOneDescription",
+			"NewsletterOneFrequency",
+			"NewletterOneUniqueness",
+			"NewsletterTwo",
+			"NewsletterTwoFormat",
+			"NewsletterTwoDescription",
+			"NewsletterTwoFrequency",
+			"NewletterTwoUniqueness",
+			"NewsletterThree",
+			"NewsletterThreeFormat",
+			"NewsletterThreeDescription",
+			"NewsletterThreeFrequency",
+			"NewletterThreeUniqueness",
+			"ReportsResearch",
+			"NumberOfReports",
+			"ReportResearchDescription",
+			"CompetitivePosition",
+			"Competitor",
+			"RetailPrice",
+			"Publisher",
+			"StaffDescription",
+			"EditorName",
+			"MarquisEditor",
+			"Freelancers",
+			"OwnFreelancerContent",
+			"OriginalVideoMedia",
+			"VideoMediaRights",
+			"OriginalPhotoMedia",
+			"PhotoMediaRights",
+			"OriginalGraphs",
+			"GraphsRights",
+		].join(",");
 
-	const exportPdf = async () => {
-		const jsPDF = await import("jspdf");
-		const autoTable = await import("jspdf-autotable");
-		const doc = new jsPDF.default(0, 0);
-		doc.autoTable(exportColumns, exportableProducts);
-		doc.save("products.pdf");
+		// Prepare the data for CSV
+		const csvRows = products.map((product) => {
+			return [
+				product.Client || "",
+				product.ProductName || "",
+				product.Category || "",
+				product.PublicationType || "",
+				product.ISBN || "",
+				product.ISSN || "",
+				product.Url || "",
+				product.FirstYearPublished || "",
+				product.DOI || "",
+				product.Description || "",
+				product.IssuesPerYear || "",
+				product.PublicationFormats || "",
+				product.OnlineContentFrequency || "",
+				product.TopicsCovered || "",
+				product.AudienceDescription || "",
+				product.Circulation || "",
+				product.AnnualTraffic || "",
+				product.SubscriptionType || "",
+				product.AnnualSubPrice || "",
+				product.IndividualCopyPrice || "",
+				product.NumberOfEvents || "",
+				product.EventOne || "",
+				product.EventOneDescription || "",
+				product.EventOneRecording || "",
+				product.EventTwo || "",
+				product.EventTwoDescription || "",
+				product.EventTwoRecording || "",
+				product.EventThree || "",
+				product.EventThreeDescription || "",
+				product.EventThreeRecording || "",
+				product.NumberOfNewsletters || "",
+				product.NewsletterOne || "",
+				product.NewsletterOneFormat || "",
+				product.NewsletterOneDescription || "",
+				product.NewsletterOneFrequency || "",
+				product.NewletterOneUniqueness || "",
+				product.NewsletterTwo || "",
+				product.NewsletterTwoFormat || "",
+				product.NewsletterTwoDescription || "",
+				product.NewsletterTwoFrequency || "",
+				product.NewletterTwoUniqueness || "",
+				product.NewsletterThree || "",
+				product.NewsletterThreeFormat || "",
+				product.NewsletterThreeDescription || "",
+				product.NewsletterThreeFrequency || "",
+				product.NewletterThreeUniqueness || "",
+				product.ReportsResearch || "",
+				product.NumberOfReports || "",
+				product.ReportResearchDescription || "",
+				product.CompetitivePosition || "",
+				product.Competitor || "",
+				product.RetailPrice || "",
+				product.Publisher || "",
+				product.StaffDescription || "",
+				product.EditorName || "",
+				product.MarquisEditor || "",
+				product.Freelancers || "",
+				product.OwnFreelancerMediaContent || "",
+				product.OriginalVideoMedia || "",
+				product.VideoMediaRights || "",
+				product.OriginalPhotoMedia || "",
+				product.PhotoMediaRights || "",
+				product.OriginalGraphs || "",
+				product.GraphsRights || "",
+			]
+				.map((field) => `"${field}"`)
+				.join(","); // Enclose each field in quotes and join with comma
+		});
+
+		// Combine headers and rows
+		const csvString = [headers, ...csvRows].join("\r\n");
+
+		// Trigger CSV download
+		const blob = new Blob([csvString], { type: "text/csv" });
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.setAttribute("hidden", "");
+		a.setAttribute("href", url);
+		a.setAttribute("download", "products.csv");
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
 	};
-
-	// const exportCSVWithAllFields = () => {
-	// 	exportCSV({
-	// 		data: products,
-	// 		fields: exportColumns,
-	// 	});
-	// };
 
 	// **************************************************************** HEADER / FOOTER **************************************************************
 	const header = (
@@ -231,14 +362,14 @@ const ProductTablePrime = () => {
 					onClick={exportCSVWithAllFields}
 					data-pr-tooltip="CSV"
 				/> */}
-				{/* <Button
+				<Button
 					type="button"
 					icon="pi pi-file-pdf"
 					className="p-button-warning"
 					rounded
-					onClick={exportPdf}
+					onClick={exportCSV}
 					data-pr-tooltip="PDF"
-				/> */}
+				/>
 			</div>
 		</div>
 	);
@@ -287,7 +418,6 @@ const ProductTablePrime = () => {
 									<b>Description:</b> {data.Description}
 								</div>
 							)}
-							{/* ... Add more fields as per requirement */}
 						</div>
 					</TabPanel>
 					<TabPanel header="Additional Details">
@@ -623,7 +753,6 @@ const ProductTablePrime = () => {
 							)}
 						</div>
 					</TabPanel>
-					{/* Add more TabPanels as per your data grouping */}
 				</TabView>
 			</div>
 		);
@@ -728,17 +857,17 @@ const ProductTablePrime = () => {
 					field="ProductName"
 					header="Product Name"
 					// style={{ width: "40%" }}
-					filter
+					// filter
 					showFilterMenu={false}
 					showClearButton={false}
-					filterPlaceholder="Search by Product Name"
+					// filterPlaceholder="Search by Product Name"
 					sortable
-					filterElement={
-						<InputText
-							onChange={(e) => onFilterChange(e, "ProductName")}
-							placeholder="Search by Product Name"
-						/>
-					}
+					// filterElement={
+					// 	<InputText
+					// 		onChange={(e) => onFilterChange(e, "ProductName")}
+					// 		placeholder="Search by Product Name"
+					// 	/>
+					// }
 				/>
 			</DataTable>
 		</div>
